@@ -1,11 +1,44 @@
-<script setup></script>
-
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
+  <div class="container">
+    <h1>TP Vue.js - Composants dynamiques</h1>
+
+    <button @click="activeComponent='HomeComponent'">
+      Accueil
+    </button>
+
+    <button @click="activeComponent='FormComponent'">
+      Formulaire
+    </button>
+
+    <hr>
+
+    <KeepAlive>
+      <component :is="activeComponent"></component>
+    </KeepAlive>
+
+  </div>
 </template>
 
-<style scoped></style>
+<script>
+export default {
+  data() {
+    return {
+      activeComponent: 'HomeComponent'
+    }
+  }
+}
+</script>
+
+<style scoped>
+.container{
+  width:70%;
+  margin:auto;
+  text-align:center;
+}
+
+button{
+  margin:10px;
+  padding:10px 20px;
+  cursor:pointer;
+}
+</style>
