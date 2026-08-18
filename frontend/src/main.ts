@@ -1,12 +1,13 @@
-import { createApp } from 'vue'
-import App from './App.vue'
+import { createApp } from "vue";
+import { createPinia } from "pinia";
+import "./style.css";
 
-import HomeComponent from './components/HomeComponent.vue'
-import FormComponent from './components/FormComponent.vue'
+import App from "./App.vue";
+import router from "./router";
 
-const app = createApp(App)
+const app = createApp(App);
 
-app.component('HomeComponent', HomeComponent)
-app.component('FormComponent', FormComponent)
+app.use(createPinia());
+app.use(router);
 
-app.mount('#app')
+app.mount("#app");

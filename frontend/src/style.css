@@ -1,3 +1,7 @@
-body{
-    background-color:rgba(0, 0, 0, 0.894);
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-gray-900 text-white; /* Equivalent to rgba(0, 0, 0, 0.894) with a modern feel */
+  }
 }
