@@ -7,6 +7,9 @@ export default {
   theme: {
     extend: {
       colors: {
+        'primary': '#0D737D',
+        'secondary': '#01173F',
+        'background': '#FFFFFF',
         'gt-bg': '#0b0f19', // The darkest background
         'gt-card': '#13182b', // Card background
         'gt-blue': '#2563eb', // Primary neon blue

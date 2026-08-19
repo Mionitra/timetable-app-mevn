@@ -19,6 +19,8 @@ export const register = async (req, res) => {
       filiere,
       typeEnseignant,
       discipline,
+      profileImage,
+      coverImage,
     } = req.body;
 
     // Vérification des champs
@@ -60,6 +62,8 @@ export const register = async (req, res) => {
       password: hashedPassword,
       role: userRole,
       isActive: true,
+      profileImage,
+      coverImage,
     };
 
     if (userRole === "etudiant") {
@@ -114,10 +118,10 @@ export const login = async (req, res) => {
       });
     }
 
-    // Recherche utilisateur
+    // Recherche utilisateur (en incluant le mot de passe qui est caché par défaut)
     const user = await User.findOne({
       email,
-    });
+    }).select("+password");
 
     if (!user) {
       return res.status(401).json({

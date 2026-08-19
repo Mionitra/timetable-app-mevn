@@ -41,37 +41,37 @@ const handleLogin = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen flex justify-center items-center bg-gray-900">
-    <div class="w-full max-w-md p-8 bg-gray-800 rounded-xl shadow-2xl border border-gray-700">
+  <div class="min-h-screen flex justify-center items-center bg-background">
+    <div class="w-full max-w-md p-8 bg-white rounded-xl shadow-2xl border border-gray-200">
 
-      <h1 class="text-3xl font-bold text-center text-white mb-2">Connexion</h1>
+      <h1 class="text-3xl font-bold text-center text-secondary mb-2">Connexion</h1>
 
-      <p class="text-center text-gray-400 mb-8">
+      <p class="text-center text-gray-500 mb-8">
         Connectez-vous à votre compte
       </p>
 
       <form @submit.prevent="handleLogin" class="space-y-5">
 
         <div>
-          <label class="block mb-2 font-semibold text-gray-200">Email</label>
+          <label class="block mb-2 font-semibold text-secondary">Email</label>
 
           <input
             v-model="email"
             type="email"
             placeholder="exemple@gmail.com"
-            class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-secondary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
             required
           />
         </div>
 
         <div>
-          <label class="block mb-2 font-semibold text-gray-200">Mot de passe</label>
+          <label class="block mb-2 font-semibold text-secondary">Mot de passe</label>
 
           <input
             v-model="password"
             type="password"
             placeholder="********"
-            class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-secondary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
             required
           />
         </div>
@@ -86,7 +86,7 @@ const handleLogin = async () => {
         <button
           type="submit"
           :disabled="authStore.loading"
-          class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          class="w-full py-3 bg-primary hover:opacity-90 text-white font-semibold rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {{
             authStore.loading
@@ -97,10 +97,10 @@ const handleLogin = async () => {
 
       </form>
 
-      <p class="mt-6 text-center text-gray-400">
+      <p class="mt-6 text-center text-gray-500">
         Vous n'avez pas de compte ?
 
-        <RouterLink to="/inscription" class="text-blue-400 hover:text-blue-300 font-medium ml-1">
+        <RouterLink to="/inscription" class="text-primary hover:opacity-80 font-medium ml-1">
           Créer un compte
         </RouterLink>
       </p>

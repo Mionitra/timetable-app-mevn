@@ -19,8 +19,6 @@ const role = ref("etudiant");
 const niveau = ref("L1");
 const filiere = ref("IAD");
 
-const typeEnseignant = ref("permanent");
-const discipline = ref("informatique");
 
 const profileImageFile = ref(null);
 const profileImageData = ref(null);
@@ -48,34 +46,8 @@ const filieres = [
   { value: "R&T", label: "R&T", description: "Réseaux et Télécommunications" },
 ];
 
-const typesEnseignant = [
-  { value: "permanent", label: "Permanent", description: "Enseignant titulaire" },
-  { value: "vacataire", label: "Vacataire", description: "Intervenant extérieur" },
-  { value: "contractuel", label: "Contractuel", description: "CDD / CDI" },
-];
 
-const disciplines = [
-  { value: "informatique", label: "Informatique" },
-  { value: "mathematiques", label: "Mathématiques" },
-  { value: "physique", label: "Physique" },
-  { value: "economie", label: "Sciences économiques" },
-  { value: "droit", label: "Droit" },
-  { value: "langues", label: "Langues" },
-  { value: "gestion", label: "Gestion" },
-];
 
-watch(role, (newRole) => {
-  errorMessage.value = "";
-  successMessage.value = "";
-
-  if (newRole === "etudiant") {
-    niveau.value = "L1";
-    filiere.value = "IAD";
-  } else if (newRole === "enseignant") {
-    typeEnseignant.value = "permanent";
-    discipline.value = "informatique";
-  }
-});
 
 const normalizeFields = () => {
   firstName.value = firstName.value.trim();
@@ -181,10 +153,6 @@ const validateStep1 = () => {
     return false;
   }
 
-  if (!["etudiant", "enseignant"].includes(role.value)) {
-    errorMessage.value = "Veuillez sélectionner un type de compte.";
-    return false;
-  }
 
   return true;
 };
@@ -193,41 +161,19 @@ const validateStep1 = () => {
 const validateStep2 = () => {
   errorMessage.value = "";
 
-  if (role.value === "etudiant") {
-    const validNiveaux = ["L1", "L2", "L3"];
-    const validFilieres = ["IAD", "ARSB", "GL", "SIG", "R&T"];
 
-    if (!niveau.value || !validNiveaux.includes(niveau.value)) {
-      errorMessage.value = "Veuillez sélectionner un niveau valide.";
-      return false;
-    }
-    if (!filiere.value || !validFilieres.includes(filiere.value)) {
-      errorMessage.value = "Veuillez sélectionner une filière valide.";
-      return false;
-    }
+  const validNiveaux = ["L1", "L2", "L3"];
+  const validFilieres = ["IAD", "ARSB", "GL", "SIG", "R&T"];
+
+  if (!niveau.value || !validNiveaux.includes(niveau.value)) {
+    errorMessage.value = "Veuillez sélectionner un niveau valide.";
+    return false;
+  }
+  if (!filiere.value || !validFilieres.includes(filiere.value)) {
+    errorMessage.value = "Veuillez sélectionner une filière valide.";
+    return false;
   }
 
-  if (role.value === "enseignant") {
-    const validTypes = ["permanent", "vacataire", "contractuel"];
-    const validDisciplines = [
-      "informatique",
-      "mathematiques",
-      "physique",
-      "economie",
-      "droit",
-      "langues",
-      "gestion",
-    ];
-
-    if (!typeEnseignant.value || !validTypes.includes(typeEnseignant.value)) {
-      errorMessage.value = "Veuillez sélectionner un statut valide.";
-      return false;
-    }
-    if (!discipline.value || !validDisciplines.includes(discipline.value)) {
-      errorMessage.value = "Veuillez sélectionner une discipline valide.";
-      return false;
-    }
-  }
 
   if (!password.value) {
     errorMessage.value = "Veuillez entrer un mot de passe.";
@@ -281,13 +227,11 @@ const buildUserData = () => {
     coverImage: coverImageData.value || null,
   };
 
-  if (role.value === "etudiant") {
+
     userData.niveau = niveau.value;
     userData.filiere = filiere.value;
-  } else if (role.value === "enseignant") {
-    userData.typeEnseignant = typeEnseignant.value;
-    userData.discipline = discipline.value;
-  }
+
+  return userData;
 
   return userData;
 };
@@ -339,36 +283,36 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="flex items-center justify-center min-h-screen px-4 py-8 bg-gray-900">
-    <div class="w-full max-w-lg overflow-hidden bg-gray-800 border border-gray-700 shadow-2xl rounded-xl">
+  <div class="flex items-center justify-center min-h-screen px-4 py-8 bg-background">
+    <div class="w-full max-w-lg overflow-hidden bg-white border border-gray-200 shadow-2xl rounded-xl">
       <!-- HEADER -->
       <div class="p-8 pb-4">
-        <h1 class="mb-2 text-3xl font-bold text-center text-white">Inscription</h1>
-        <p class="mb-6 text-center text-gray-400">Créez votre compte universitaire</p>
+        <h1 class="mb-2 text-3xl font-bold text-center text-secondary">Inscription</h1>
+        <p class="mb-6 text-center text-gray-500">Créez votre compte universitaire</p>
 
         <!-- INDICATEUR DES ÉTAPES -->
         <div class="flex items-center justify-center mb-6">
           <div class="flex items-center">
             <div :class="[
               'w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300',
-              currentStep >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-400',
+              currentStep >= 1 ? 'bg-primary text-white' : 'bg-gray-50 text-gray-500',
             ]">
               1
             </div>
-            <span class="ml-2 text-sm font-medium text-gray-300">Informations</span>
+            <span class="ml-2 text-sm font-medium text-secondary">Informations</span>
           </div>
 
           <div class="w-12 h-1 mx-3 transition-all duration-300 rounded"
-            :class="currentStep >= 2 ? 'bg-blue-600' : 'bg-gray-700'"></div>
+            :class="currentStep >= 2 ? 'bg-primary text-white' : 'bg-gray-50'"></div>
 
           <div class="flex items-center">
             <div :class="[
               'w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300',
-              currentStep >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-400',
+              currentStep >= 2 ? 'bg-primary text-white' : 'bg-gray-50 text-gray-500',
             ]">
               2
             </div>
-            <span class="ml-2 text-sm font-medium text-gray-300">Sécurité</span>
+            <span class="ml-2 text-sm font-medium text-secondary">Sécurité</span>
           </div>
         </div>
       </div>
@@ -379,8 +323,8 @@ onUnmounted(() => {
           <!-- ÉTAPE 1 -->
           <div v-if="currentStep === 1" key="step1">
             <div class="mb-6">
-              <h2 class="mb-1 text-xl font-bold text-white">Informations personnelles</h2>
-              <p class="text-sm text-gray-400">
+              <h2 class="mb-1 text-xl font-bold text-secondary">Informations personnelles</h2>
+              <p class="text-sm text-gray-500">
                 Renseignez vos informations et choisissez votre type de compte.
               </p>
             </div>
@@ -388,63 +332,29 @@ onUnmounted(() => {
             <div class="space-y-5">
               <!-- Prénom -->
               <div>
-                <label class="block mb-2 font-semibold text-gray-200">Prénom</label>
+                <label class="block mb-2 font-semibold text-secondary">Prénom</label>
                 <input v-model="firstName" type="text" autocomplete="given-name" placeholder="Votre prénom"
-                  class="w-full p-3 text-white placeholder-gray-400 transition-all bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                  class="w-full p-3 text-secondary placeholder-gray-400 transition-all bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
               </div>
 
               <!-- Nom -->
               <div>
-                <label class="block mb-2 font-semibold text-gray-200">Nom</label>
+                <label class="block mb-2 font-semibold text-secondary">Nom</label>
                 <input v-model="lastName" type="text" autocomplete="family-name" placeholder="Votre nom"
-                  class="w-full p-3 text-white placeholder-gray-400 transition-all bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                  class="w-full p-3 text-secondary placeholder-gray-400 transition-all bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
               </div>
 
               <!-- Email -->
               <div>
-                <label class="block mb-2 font-semibold text-gray-200">Email</label>
+                <label class="block mb-2 font-semibold text-secondary">Email</label>
                 <input v-model="email" type="email" autocomplete="email" placeholder="exemple@gmail.com"
-                  class="w-full p-3 text-white placeholder-gray-400 transition-all bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                  class="w-full p-3 text-secondary placeholder-gray-400 transition-all bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
                 <p class="mt-2 text-xs text-gray-500">
                   Votre adresse email sera utilisée pour vous connecter.
                 </p>
               </div>
 
-              <!-- TYPE DE COMPTE -->
-              <div>
-                <label class="block mb-3 font-semibold text-gray-200">Type de compte</label>
-                <div class="grid grid-cols-2 gap-4">
-                  <!-- Étudiant -->
-                  <button type="button" @click="role = 'etudiant'" :class="[
-                    'p-4 rounded-xl border-2 text-left transition-all duration-200',
-                    role === 'etudiant'
-                      ? 'border-blue-500 bg-blue-500/10 ring-2 ring-blue-500/30'
-                      : 'border-gray-600 bg-gray-700 hover:border-gray-500',
-                  ]">
-                    <div class="mb-2 text-3xl">👨‍🎓</div>
-                    <h3 class="font-bold text-white">Étudiant</h3>
-                    <p class="mt-1 text-sm text-gray-400">L1, L2 ou L3</p>
-                    <div v-if="role === 'etudiant'" class="mt-3 text-sm font-semibold text-blue-400">
-                      ✓ Sélectionné
-                    </div>
-                  </button>
 
-                  <!-- Enseignant -->
-                  <button type="button" @click="role = 'enseignant'" :class="[
-                    'p-4 rounded-xl border-2 text-left transition-all duration-200',
-                    role === 'enseignant'
-                      ? 'border-blue-500 bg-blue-500/10 ring-2 ring-blue-500/30'
-                      : 'border-gray-600 bg-gray-700 hover:border-gray-500',
-                  ]">
-                    <div class="mb-2 text-3xl">👨‍🏫</div>
-                    <h3 class="font-bold text-white">Enseignant</h3>
-                    <p class="mt-1 text-sm text-gray-400">Permanent, vacataire ou contractuel</p>
-                    <div v-if="role === 'enseignant'" class="mt-3 text-sm font-semibold text-blue-400">
-                      ✓ Sélectionné
-                    </div>
-                  </button>
-                </div>
-              </div>
             </div>
 
             <div v-if="errorMessage" class="p-3 mt-5 border rounded-lg bg-red-500/10 border-red-500/30">
@@ -452,36 +362,36 @@ onUnmounted(() => {
             </div>
 
             <button type="button" @click="nextStep"
-              class="w-full py-3 mt-6 font-semibold text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700">
+              class="w-full py-3 mt-6 font-semibold text-secondary transition-colors bg-primary text-white rounded-lg hover:opacity-90">
               Suivant <span class="ml-2">→</span>
             </button>
           </div>
 
           <div v-else key="step2">
             <div class="mb-6">
-              <h2 class="mb-1 text-xl font-bold text-white">Informations du compte</h2>
-              <p class="text-sm text-gray-400">
+              <h2 class="mb-1 text-xl font-bold text-secondary">Informations du compte</h2>
+              <p class="text-sm text-gray-500">
                 Complétez les informations nécessaires pour terminer votre inscription.
               </p>
             </div>
 
             <div class="space-y-5">
 
-              <div v-if="role === 'etudiant'" class="p-4 border border-gray-600 bg-gray-700/50 rounded-xl">
-                <h3 class="mb-4 font-semibold text-white">🎓 Informations étudiant</h3>
+              <div class="p-4 border border-gray-300 bg-gray-50/50 rounded-xl">
+                <h3 class="mb-4 font-semibold text-secondary">🎓 Informations étudiant</h3>
                 <div>
-                  <label class="block mb-2 font-medium text-gray-300">Niveau d'étude</label>
+                  <label class="block mb-2 font-medium text-secondary">Niveau d'étude</label>
                   <select v-model="niveau"
-                    class="w-full p-3 text-white bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    class="w-full p-3 text-secondary bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
                     <option v-for="item in niveaux" :key="item.value" :value="item.value">
                       {{ item.label }} – {{ item.description }}
                     </option>
                   </select>
                 </div>
                 <div class="mt-4">
-                  <label class="block mb-2 font-medium text-gray-300">Filière / Spécialité</label>
+                  <label class="block mb-2 font-medium text-secondary">Filière / Spécialité</label>
                   <select v-model="filiere"
-                    class="w-full p-3 text-white bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    class="w-full p-3 text-secondary bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
                     <option v-for="item in filieres" :key="item.value" :value="item.value">
                       {{ item.value }} – {{ item.description }}
                     </option>
@@ -489,40 +399,20 @@ onUnmounted(() => {
                 </div>
               </div>
 
-              <div v-if="role === 'enseignant'" class="p-4 border border-gray-600 bg-gray-700/50 rounded-xl">
-                <h3 class="mb-4 font-semibold text-white">👨‍🏫 Informations enseignant</h3>
-                <div>
-                  <label class="block mb-2 font-medium text-gray-300">Statut</label>
-                  <select v-model="typeEnseignant"
-                    class="w-full p-3 text-white bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option v-for="item in typesEnseignant" :key="item.value" :value="item.value">
-                      {{ item.label }} – {{ item.description }}
-                    </option>
-                  </select>
-                </div>
-                <div class="mt-4">
-                  <label class="block mb-2 font-medium text-gray-300">Discipline enseignée</label>
-                  <select v-model="discipline"
-                    class="w-full p-3 text-white bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option v-for="item in disciplines" :key="item.value" :value="item.value">
-                      {{ item.label }}
-                    </option>
-                  </select>
-                </div>
-              </div>
 
-              <div class="p-4 border border-gray-600 bg-gray-700/50 rounded-xl">
-                <h3 class="mb-4 font-semibold text-white">📷 Photos de profil et de couverture</h3>
+
+              <div class="p-4 border border-gray-300 bg-gray-50/50 rounded-xl">
+                <h3 class="mb-4 font-semibold text-secondary">📷 Photos de profil et de couverture</h3>
 
                 <div>
-                  <label class="block mb-2 font-medium text-gray-300">Photo de profil</label>
+                  <label class="block mb-2 font-medium text-secondary">Photo de profil</label>
                   <input type="file" accept="image/jpeg,image/png,image/webp,image/gif"
                     @change="handleProfileImageUpload"
-                    class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700" />
+                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:opacity-90" />
                   <div v-if="profileImageData" class="mt-3">
                     <img :src="profileImageData" alt="Aperçu photo de profil"
-                      class="object-cover w-24 h-24 border-2 border-blue-500 rounded-full" />
-                    <p class="mt-1 text-xs text-gray-400">Aperçu</p>
+                      class="object-cover w-24 h-24 border-2 border-primary rounded-full" />
+                    <p class="mt-1 text-xs text-gray-500">Aperçu</p>
                   </div>
                   <p class="mt-2 text-xs text-gray-500">
                     Formats acceptés : JPG, PNG, WEBP, GIF. Taille max : 5 Mo.
@@ -530,13 +420,13 @@ onUnmounted(() => {
                 </div>
 
                 <div class="mt-4">
-                  <label class="block mb-2 font-medium text-gray-300">Photo de couverture</label>
+                  <label class="block mb-2 font-medium text-secondary">Photo de couverture</label>
                   <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" @change="handleCoverImageUpload"
-                    class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700" />
+                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:opacity-90" />
                   <div v-if="coverImageData" class="mt-3">
                     <img :src="coverImageData" alt="Aperçu photo de couverture"
-                      class="object-cover w-full border-2 border-blue-500 rounded-lg max-h-32" />
-                    <p class="mt-1 text-xs text-gray-400">Aperçu</p>
+                      class="object-cover w-full border-2 border-primary rounded-lg max-h-32" />
+                    <p class="mt-1 text-xs text-gray-500">Aperçu</p>
                   </div>
                   <p class="mt-2 text-xs text-gray-500">
                     Formats acceptés : JPG, PNG, WEBP, GIF. Taille max : 5 Mo.
@@ -545,18 +435,18 @@ onUnmounted(() => {
               </div>
 
               <div>
-                <label class="block mb-2 font-semibold text-gray-200">Mot de passe</label>
+                <label class="block mb-2 font-semibold text-secondary">Mot de passe</label>
                 <input v-model="password" type="password" autocomplete="new-password" placeholder="••••••••"
                   minlength="6"
-                  class="w-full p-3 text-white placeholder-gray-400 transition-all bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-                <p class="mt-2 text-xs text-gray-400">Minimum 6 caractères.</p>
+                  class="w-full p-3 text-secondary placeholder-gray-400 transition-all bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
+                <p class="mt-2 text-xs text-gray-500">Minimum 6 caractères.</p>
               </div>
 
               <div>
-                <label class="block mb-2 font-semibold text-gray-200">Confirmer le mot de passe</label>
+                <label class="block mb-2 font-semibold text-secondary">Confirmer le mot de passe</label>
                 <input v-model="confirmPassword" type="password" autocomplete="new-password" placeholder="••••••••"
                   minlength="6"
-                  class="w-full p-3 text-white placeholder-gray-400 transition-all bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                  class="w-full p-3 text-secondary placeholder-gray-400 transition-all bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
               </div>
 
               <div v-if="errorMessage" class="p-3 border rounded-lg bg-red-500/10 border-red-500/30">
@@ -570,11 +460,11 @@ onUnmounted(() => {
 
             <div class="flex gap-4 mt-6">
               <button type="button" @click="previousStep" :disabled="authStore.loading"
-                class="w-1/3 py-3 font-semibold text-gray-200 transition-colors bg-gray-700 border border-gray-600 rounded-lg hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                class="w-1/3 py-3 font-semibold text-secondary transition-colors bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed">
                 ← Précédent
               </button>
               <button type="button" @click="handleRegister" :disabled="authStore.loading"
-                class="flex-1 py-3 font-semibold text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed">
+                class="flex-1 py-3 font-semibold text-white transition-colors bg-primary rounded-lg hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed">
                 <span v-if="authStore.loading">
                   <svg class="inline w-5 h-5 mr-2 -ml-1 text-white animate-spin" xmlns="http://www.w3.org/2000/svg"
                     fill="none" viewBox="0 0 24 24">
@@ -591,9 +481,9 @@ onUnmounted(() => {
           </div>
         </Transition>
 
-        <p class="mt-6 text-center text-gray-400">
+        <p class="mt-6 text-center text-gray-500">
           Vous avez déjà un compte ?
-          <RouterLink to="/connexion" class="ml-1 font-medium text-blue-400 hover:text-blue-300">
+          <RouterLink to="/connexion" class="ml-1 font-medium text-primary hover:text-blue-300">
             Se connecter
           </RouterLink>
         </p>

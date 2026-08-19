@@ -6,10 +6,7 @@ const authStore = useAuthStore();
 </script>
 
 <template>
-  <div id="app" class="relative min-h-screen overflow-x-hidden text-white font-sans bg-gt-bg">
-    <!-- Fond image (Starry Night) -->
-    <div class="fixed inset-0 -z-20 bg-[url('https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=2000&q=80')] bg-cover bg-center bg-no-repeat opacity-40"></div>
-    <div class="fixed inset-0 -z-10 bg-gt-bg/60 backdrop-blur-[2px]"></div>
+  <div id="app" class="relative min-h-screen overflow-x-hidden text-secondary font-sans bg-background">
 
     <!-- Header (Hidden for student since they have a specific dashboard layout) -->
     <Header v-if="authStore.isAuthenticated && authStore.user?.role !== 'etudiant'" />
