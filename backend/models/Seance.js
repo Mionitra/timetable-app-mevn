@@ -35,11 +35,6 @@ const seanceSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    typeSeance: {
-      type: String,
-      enum: ['cours', 'TD', 'TP', 'examen'],
-      default: 'cours',
-    },
     conflit: {
       type: Boolean, // marqué true par le module de détection de conflits
       default: false,

@@ -14,20 +14,10 @@ const matiereSchema = new mongoose.Schema(
       uppercase: true,
       trim: true, // ex: 'INFO301'
     },
-    volumeHoraire: {
-      type: Number, // total d'heures sur le semestre
-      required: true,
-    },
     dureeSeance: {
       type: Number, // durée d'une séance en minutes, ex: 90
       default: 90,
     },
-    typeSalleRequis: {
-      type: String,
-      enum: ['amphi', 'TD', 'TP', 'laboratoire', 'indifferent'],
-      default: 'indifferent',
-    },
-    equipementsRequis: [{ type: String }], // ex: ['videoprojecteur', 'ordinateurs']
     enseignantsIds: [
       {
         type: mongoose.Schema.Types.ObjectId,

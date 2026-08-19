@@ -20,7 +20,6 @@ const salleSchema = new mongoose.Schema(
       enum: ['amphi', 'TD', 'TP', 'laboratoire', 'salle_reunion'],
       required: true,
     },
-    equipements: [{ type: String }], // ex: ['videoprojecteur', 'tableau_interactif']
     disponible: {
       type: Boolean,
       default: true, // false si en maintenance / indisponible temporairement
