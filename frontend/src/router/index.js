@@ -57,13 +57,48 @@ const routes = [
 
   {
     path: "/etudiant",
-    name: "EtudiantDashboard",
     component: EtudiantDashboard,
-
     meta: {
       requiresAuth: true,
       role: "etudiant",
     },
+    children: [
+      {
+        path: "",
+        name: "EtudiantDashboardOverview",
+        component: () => import("../views/etudiant/DashboardOverview.vue"),
+      },
+      {
+        path: "schedule",
+        name: "EtudiantSchedule",
+        component: () => import("../views/etudiant/ScheduleView.vue"),
+      },
+      {
+        path: "subjects",
+        name: "EtudiantSubjects",
+        component: () => import("../views/etudiant/SubjectsView.vue"),
+      },
+      {
+        path: "subjects/:id",
+        name: "EtudiantSubjectDetails",
+        component: () => import("../views/etudiant/SubjectDetailsView.vue"),
+      },
+      {
+        path: "course/:id",
+        name: "EtudiantCourseDetails",
+        component: () => import("../views/etudiant/CourseDetailsView.vue"),
+      },
+      {
+        path: "profile",
+        name: "EtudiantProfile",
+        component: () => import("../views/etudiant/ProfileView.vue"),
+      },
+      {
+        path: "settings",
+        name: "EtudiantSettings",
+        component: () => import("../views/etudiant/SettingsView.vue"),
+      }
+    ]
   },
 ];
 

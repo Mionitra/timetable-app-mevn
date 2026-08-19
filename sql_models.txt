@@ -1,0 +1,97 @@
+-- ==============================================================================
+-- Modèles SQL pour l'application de Gestion d'Emploi du Temps (Espace Étudiant)
+-- ==============================================================================
+
+-- 1. Table des Utilisateurs (Étudiants, Enseignants, Admins)
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    role ENUM('admin', 'enseignant', 'etudiant') DEFAULT 'etudiant',
+    student_id VARCHAR(50) UNIQUE, -- Matricule (pour les étudiants)
+    department VARCHAR(100),
+    study_level VARCHAR(50),
+    join_date DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 2. Table des Paramètres Utilisateur (Settings)
+CREATE TABLE user_settings (
+    user_id INT PRIMARY KEY,
+    theme VARCHAR(20) DEFAULT 'dark',
+    language VARCHAR(10) DEFAULT 'fr',
+    compact_view BOOLEAN DEFAULT FALSE,
+    notif_course_changes BOOLEAN DEFAULT TRUE,
+    notif_new_grades BOOLEAN DEFAULT TRUE,
+    notif_announcements BOOLEAN DEFAULT FALSE,
+    notif_email_digest BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- 3. Table des Matières (Subjects)
+CREATE TABLE subjects (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    code VARCHAR(50) UNIQUE NOT NULL,
+    credits INT DEFAULT 0,
+    color VARCHAR(30) DEFAULT 'blue',
+    description TEXT,
+    teacher_id INT, -- L'enseignant responsable
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- 4. Table des Inscriptions (Lien Étudiants <-> Matières)
+CREATE TABLE enrollments (
+    student_id INT,
+    subject_id INT,
+    enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (student_id, subject_id),
+    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
+);
+
+-- 5. Table des Séances de Cours (Courses / Schedule)
+CREATE TABLE courses (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    subject_id INT NOT NULL,
+    teacher_id INT, -- Optionnel si c'est un autre prof qui fait le TD
+    type ENUM('CM', 'TD', 'TP', 'EXAMEN') NOT NULL,
+    course_date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    day_of_week INT, -- 0 = Lundi, 1 = Mardi, etc. (pour les cours récurrents)
+    room VARCHAR(50),
+    building VARCHAR(100),
+    status ENUM('upcoming', 'ongoing', 'completed', 'cancelled') DEFAULT 'upcoming',
+    description TEXT,
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
+    FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- 6. Table des Ressources / Documents liés
+CREATE TABLE materials (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    subject_id INT,
+    course_id INT, -- Optionnel: Si le doc est lié à une séance précise
+    name VARCHAR(255) NOT NULL,
+    file_type VARCHAR(50), -- pdf, doc, code...
+    file_size VARCHAR(20), -- ex: '150 KB'
+    file_url VARCHAR(500) NOT NULL,
+    upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE SET NULL
+);
+
+-- 7. Table des Annonces
+CREATE TABLE announcements (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    author_id INT,
+    target_audience ENUM('all', 'etudiant', 'enseignant') DEFAULT 'all',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE SET NULL
+);

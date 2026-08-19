@@ -1,60 +1,43 @@
 <script setup>
 import { useAuthStore } from "./stores/auth";
+import Header from "./components/Header.vue";
 
 const authStore = useAuthStore();
-
-const logout = () => {
-  authStore.logout();
-  window.location.href = "/connexion";
-};
 </script>
 
 <template>
-  <div id="app" class="min-h-screen bg-gray-900 text-white">
+  <div id="app" class="relative min-h-screen overflow-x-hidden text-white font-sans bg-gt-bg">
+    <!-- Fond image (Starry Night) -->
+    <div class="fixed inset-0 -z-20 bg-[url('https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=2000&q=80')] bg-cover bg-center bg-no-repeat opacity-40"></div>
+    <div class="fixed inset-0 -z-10 bg-gt-bg/60 backdrop-blur-[2px]"></div>
 
-    <!-- Navigation uniquement si l'utilisateur est connecté -->
-    <header v-if="authStore.isAuthenticated" class="h-[65px] px-8 flex items-center justify-between bg-slate-800 shadow-md">
+    <!-- Header (Hidden for student since they have a specific dashboard layout) -->
+    <Header v-if="authStore.isAuthenticated && authStore.user?.role !== 'etudiant'" />
 
-      <div class="text-xl font-bold tracking-wide">
-        Gestion EDT
+    <!-- Contenu -->
+    <main :class="['min-h-screen p-4 sm:p-6 lg:p-8 flex items-center justify-center', {'pt-[90px]': authStore.user?.role !== 'etudiant'}]">
+      <div class="w-full h-full max-w-[1400px]">
+        <RouterView v-slot="{ Component }">
+          <transition name="fade" mode="out-in">
+            <component :is="Component" />
+          </transition>
+        </RouterView>
       </div>
-
-      <nav class="flex items-center gap-6">
-        <RouterLink
-          v-if="authStore.role === 'admin'"
-          to="/admin"
-          class="text-white hover:text-blue-400 transition-colors"
-        >
-          Administration
-        </RouterLink>
-
-        <RouterLink
-          v-if="authStore.role === 'enseignant'"
-          to="/enseignant"
-          class="text-white hover:text-blue-400 transition-colors"
-        >
-          Espace Enseignant
-        </RouterLink>
-
-        <RouterLink
-          v-if="authStore.role === 'etudiant'"
-          to="/etudiant"
-          class="text-white hover:text-blue-400 transition-colors"
-        >
-          Espace Étudiant
-        </RouterLink>
-
-        <button @click="logout" class="py-2 px-4 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors font-medium">
-          Déconnexion
-        </button>
-      </nav>
-
-    </header>
-
-    <!-- Les différentes pages apparaissent ici -->
-    <main class="min-h-[calc(100vh-65px)] p-6">
-      <RouterView />
     </main>
-
   </div>
 </template>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+</style>
