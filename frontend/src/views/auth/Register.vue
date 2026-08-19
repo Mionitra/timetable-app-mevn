@@ -232,8 +232,6 @@ const buildUserData = () => {
     userData.filiere = filiere.value;
 
   return userData;
-
-  return userData;
 };
 
 const handleRegister = async () => {

@@ -106,7 +106,7 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const {
+    let {
       email,
       password,
     } = req.body;
@@ -117,6 +117,9 @@ export const login = async (req, res) => {
         message: "Email et mot de passe obligatoires",
       });
     }
+
+    email = email.toLowerCase().trim();
+    password = password.trim();
 
     // Recherche utilisateur (en incluant le mot de passe qui est caché par défaut)
     const user = await User.findOne({

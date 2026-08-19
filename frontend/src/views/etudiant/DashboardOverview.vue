@@ -1,18 +1,16 @@
 <script setup>
-import { ref } from 'vue';
+import { onMounted, computed } from 'vue';
+import { useEtudiantStore } from '../../stores/etudiant';
 
-const nextClass = ref({
-  subject: 'Design System',
-  description: 'create a responsive design system for landing pages and projects, focusing on consistency, scalability, and reusable components.',
-  time: '08:00 Am 08:00 Pm',
-  participants: ['Design team', 'Marketing team', 'Development Team'],
-  progress: 70
+const etudiantStore = useEtudiantStore();
+
+onMounted(() => {
+  etudiantStore.fetchDashboard();
 });
 
-const todayClasses = ref([
-  { id: 1, subject: 'Meeting with pela members', description: 'meeting to review the new website design with updated features...', time: '08:00 Am 10:00 Am' },
-  { id: 2, subject: 'Meeting With The Sales Team', description: 'checking the sales of the month and estimating the costs and sales of the next month', time: '11:00 Am 02:00 Am' },
-]);
+const nextClass = computed(() => etudiantStore.dashboard.nextClass);
+const todayClasses = computed(() => etudiantStore.dashboard.todayClasses);
+const stats = computed(() => etudiantStore.dashboard.stats);
 </script>
 
 <template>
@@ -50,14 +48,14 @@ const todayClasses = ref([
       <!-- Left Column (Tasks/Meetings) -->
       <div class="lg:col-span-2 space-y-4">
          <!-- Regular Task Card 1 -->
-         <div class="bg-gt-card border border-white/5 rounded-3xl p-6">
+         <div v-if="todayClasses.length > 0" class="bg-gt-card border border-white/5 rounded-3xl p-6">
             <div class="flex items-center gap-2 mb-2">
                <span class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]"></span>
                <span class="text-xs font-semibold text-green-500 uppercase tracking-wider">Today</span>
             </div>
             
             <div class="flex justify-between items-start mb-2">
-               <h3 class="text-lg font-bold text-white">{{ todayClasses[0].subject }}</h3>
+               <h3 class="text-lg font-bold text-white">{{ todayClasses[0].subject?.name || todayClasses[0].subject }}</h3>
                <div class="flex items-center gap-2">
                   <button class="p-1.5 rounded-full bg-white/5 text-gray-400 hover:text-white"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg></button>
                   <button class="p-1.5 rounded-full bg-white/5 text-gray-400 hover:text-white"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg></button>
@@ -68,7 +66,7 @@ const todayClasses = ref([
             <div class="flex justify-between items-end">
                <div class="flex items-center gap-2 text-sm text-gray-400 font-medium">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                  {{ todayClasses[0].time }}
+                  {{ todayClasses[0].startTime }} - {{ todayClasses[0].endTime }}
                </div>
                <div class="flex items-center gap-2">
                   <div class="flex -space-x-2">
@@ -82,14 +80,14 @@ const todayClasses = ref([
          </div>
 
          <!-- Highlighted Glowing Task Card -->
-         <div class="relative bg-gt-card border border-white/5 rounded-3xl p-6 overflow-hidden">
+         <div v-if="nextClass" class="relative bg-gt-card border border-white/5 rounded-3xl p-6 overflow-hidden">
             <!-- Glow background -->
             <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[80%] h-24 bg-gt-blue/40 blur-[40px] pointer-events-none"></div>
             
             <div class="relative z-10">
                <div class="flex items-center gap-2 mb-4">
                   <span class="w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_8px_#60a5fa]"></span>
-                  <span class="text-xs font-semibold text-blue-400 uppercase tracking-wider">Today</span>
+                  <span class="text-xs font-semibold text-blue-400 uppercase tracking-wider">Prochain cours</span>
                </div>
                
                <div class="flex items-start gap-4 mb-4">
@@ -98,21 +96,21 @@ const todayClasses = ref([
                   </div>
                   <div class="flex-1">
                      <div class="flex justify-between items-start mb-1">
-                        <h3 class="text-xl font-bold text-white">{{ nextClass.subject }}</h3>
+                        <h3 class="text-xl font-bold text-white">{{ nextClass.subject?.name || nextClass.subject }}</h3>
                         <div class="flex items-center gap-2">
-                           <span class="text-xs font-medium text-gray-400 flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg> 6 Files</span>
+                           <span class="text-xs font-medium text-gray-400 flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg> {{ nextClass.type }}</span>
                            <button class="p-1.5 rounded-full bg-white/5 text-gray-400 hover:text-white"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path></svg></button>
                            <button class="p-1.5 rounded-full bg-white/5 text-gray-400 hover:text-white"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg></button>
                         </div>
                      </div>
-                     <p class="text-sm text-gray-400">Description : {{ nextClass.description }}</p>
+                     <p class="text-sm text-gray-400">Description : {{ nextClass.description || "Aucune description" }}</p>
                   </div>
                </div>
                
                <div class="flex justify-between items-center mb-6 pl-18">
                   <div class="flex items-center gap-2 text-sm text-gray-400 font-medium ml-18">
                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                     {{ nextClass.time }}
+                     {{ nextClass.startTime }} - {{ nextClass.endTime }} (Salle: {{ nextClass.room }})
                   </div>
                   <div class="flex items-center gap-2">
                      <div class="flex -space-x-2">
@@ -122,39 +120,20 @@ const todayClasses = ref([
                      <span class="text-xs text-gray-500 font-medium">+8 People</span>
                   </div>
                </div>
-
-               <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-t border-white/5 pt-4">
-                  <div class="flex items-center gap-2">
-                     <span class="text-sm font-medium text-gray-400">Participants :</span>
-                     <div class="flex gap-2">
-                        <span v-for="p in nextClass.participants" :key="p" class="px-2.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-medium text-blue-300">{{ p }}</span>
-                     </div>
-                  </div>
-                  <div class="flex items-center gap-3 w-full sm:w-auto">
-                     <span class="text-sm font-medium text-gray-400">Progress :</span>
-                     <div class="w-32 h-6 rounded-full bg-white/5 border border-white/10 relative overflow-hidden flex items-center justify-center p-0.5">
-                        <div class="absolute left-0 top-0 bottom-0 bg-blue-500 rounded-full" :style="{width: `${nextClass.progress}%`}">
-                           <!-- Stripes for progress bar -->
-                           <div class="absolute inset-0 opacity-30" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 4px, white 4px, white 8px);"></div>
-                        </div>
-                     </div>
-                     <span class="text-sm font-bold text-white">%{{ nextClass.progress }}</span>
-                  </div>
-               </div>
             </div>
          </div>
 
          <!-- Regular Task Card 2 -->
-         <div class="bg-gt-card border border-white/5 rounded-3xl p-6">
+         <div v-if="todayClasses.length > 1" class="bg-gt-card border border-white/5 rounded-3xl p-6">
             <div class="flex items-center gap-2 mb-2">
                <span class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]"></span>
                <span class="text-xs font-semibold text-green-500 uppercase tracking-wider">Today</span>
             </div>
             
             <div class="flex justify-between items-start mb-2">
-               <h3 class="text-lg font-bold text-white">{{ todayClasses[1].subject }}</h3>
+               <h3 class="text-lg font-bold text-white">{{ todayClasses[1].subject?.name || todayClasses[1].subject }}</h3>
                <div class="flex items-center gap-2">
-                  <button class="p-1.5 rounded-full bg-white/5 text-gray-400 hover:text-white"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3-3z"></path></svg></button>
+                  <button class="p-1.5 rounded-full bg-white/5 text-gray-400 hover:text-white"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path></svg></button>
                   <button class="p-1.5 rounded-full bg-white/5 text-gray-400 hover:text-white"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg></button>
                   <button class="p-1.5 rounded-full bg-white/5 text-gray-400 hover:text-white"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg></button>
                </div>
@@ -164,7 +143,7 @@ const todayClasses = ref([
             <div class="flex justify-between items-end">
                <div class="flex items-center gap-2 text-sm text-gray-400 font-medium">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                  {{ todayClasses[1].time }}
+                  {{ todayClasses[1].startTime }} - {{ todayClasses[1].endTime }}
                </div>
                <div class="flex items-center gap-2">
                   <div class="flex -space-x-2">
@@ -237,7 +216,7 @@ const todayClasses = ref([
             <div class="relative z-10 flex justify-between items-start mb-6">
                <div>
                   <h3 class="text-lg font-bold text-white mb-1">Activity</h3>
-                  <p class="text-xs text-gray-400">13 Tasks Completed 🥳</p>
+                  <p class="text-xs text-gray-400">{{ stats.totalSubjects }} Matières suivies</p>
                </div>
                <button class="px-4 py-2 rounded-full bg-transparent border border-white/10 text-xs font-medium text-white flex items-center gap-3 relative shadow-[inset_0_0_15px_rgba(255,255,255,0.05)]">
                   Get the report
