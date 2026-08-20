@@ -1,11 +1,40 @@
-<script setup></script>
+<script setup>
+import { useAuthStore } from "./stores/auth";
+import Header from "./components/Header.vue";
+
+const authStore = useAuthStore();
+</script>
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
+  <div id="app" class="relative min-h-screen overflow-x-hidden text-secondary font-sans bg-background">
+
+    <!-- Header (Hidden for student since they have a specific dashboard layout) -->
+    <Header v-if="authStore.isAuthenticated && authStore.user?.role !== 'etudiant'" />
+
+    <!-- Contenu -->
+    <main :class="['min-h-screen p-4 sm:p-6 lg:p-8 flex items-center justify-center', {'pt-[90px]': authStore.user?.role !== 'etudiant'}]">
+      <div class="w-full h-full max-w-[1400px]">
+        <RouterView v-slot="{ Component }">
+          <transition name="fade" mode="out-in">
+            <component :is="Component" />
+          </transition>
+        </RouterView>
+      </div>
+    </main>
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+</style>

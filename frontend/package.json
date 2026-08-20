@@ -1,42 +1,31 @@
 {
-  "name": "timetable-app",
-  "version": "0.0.0",
+  "name": "frontend",
   "private": true,
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "start": "vite",
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "format": "prettier --write --experimental-cli src/"
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.3.3",
-    "tailwindcss": "^4.3.3",
-    "vue": "rc",
+    "axios": "^1.19.0",
+    "lucide-vue-next": "^0.577.0",
+    "pinia": "^4.0.3",
+    "vue": "^3.5.34",
     "vue-router": "^5.2.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^6.0.8",
-    "prettier": "3.9.5",
-    "vite": "^8.1.5",
-    "vite-plugin-vue-devtools": "^8.1.5"
-  },
-  "engines": {
-    "node": "^22.18.0 || >=24.12.0"
-  },
-  "overrides": {
-    "vue": "rc",
-    "@vue/compiler-core": "rc",
-    "@vue/compiler-dom": "rc",
-    "@vue/compiler-sfc": "rc",
-    "@vue/compiler-ssr": "rc",
-    "@vue/compiler-vapor": "rc",
-    "@vue/reactivity": "rc",
-    "@vue/runtime-core": "rc",
-    "@vue/runtime-dom": "rc",
-    "@vue/runtime-vapor": "rc",
-    "@vue/server-renderer": "rc",
-    "@vue/shared": "rc",
-    "@vue/compat": "rc"
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^24.12.3",
+    "@vitejs/plugin-vue": "^6.0.6",
+    "@vue/tsconfig": "^0.9.1",
+    "autoprefixer": "^10.5.4",
+    "postcss": "^8.5.26",
+    "tailwindcss": "^4.3.3",
+    "typescript": "~6.0.2",
+    "vite": "^8.0.12",
+    "vue-tsc": "^3.2.8"
   }
 }
