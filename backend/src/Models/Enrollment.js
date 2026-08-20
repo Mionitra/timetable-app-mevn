@@ -2,36 +2,21 @@ import mongoose from "mongoose";
 
 const enrollmentSchema = new mongoose.Schema(
   {
-    student: {
+    student_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-
-    subject: {
+    subject_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Subject",
       required: true,
     },
-
-    enrollmentDate: {
-      type: Date,
-      default: Date.now,
-    },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: { createdAt: "enrolled_at", updatedAt: false } }
 );
 
-enrollmentSchema.index(
-  { student: 1, subject: 1 },
-  { unique: true }
-);
+enrollmentSchema.index({ student_id: 1, subject_id: 1 }, { unique: true });
 
-const Enrollment = mongoose.model(
-  "Enrollment",
-  enrollmentSchema
-);
-
+const Enrollment = mongoose.model("Enrollment", enrollmentSchema);
 export default Enrollment;

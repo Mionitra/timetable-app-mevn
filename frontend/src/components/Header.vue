@@ -29,9 +29,7 @@ const closeMobileMenu = () => {
 
 <template>
     <!-- HEADER -->
-    <header v-if="authStore.isAuthenticated" class="fixed top-0 left-0 z-50 flex items-center justify-between w-full h-[72px]
-           px-4 sm:px-8 bg-white/5 backdrop-blur-xl border-b border-white/10
-           shadow-2xl shadow-black/40 transition-all duration-300">
+    <header v-if="authStore.isAuthenticated" class="fixed top-0 left-0 z-50 flex items-center justify-between w-full px-4 transition-all duration-300 border-b shadow-2xl sm:px-8 bg-white/5 backdrop-blur-xl border-white/10 shadow-black/40">
         <!-- Logo -->
         <div class="flex items-center gap-3">
             <div

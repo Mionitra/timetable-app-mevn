@@ -6,14 +6,14 @@ const authStore = useAuthStore();
 </script>
 
 <template>
-  <div id="app" class="relative min-h-screen overflow-x-hidden text-secondary font-sans bg-background">
+  <div id="app" class="relative min-h-screen overflow-x-hidden font-sans text-secondary bg-background">
 
     <!-- Header (Hidden for student since they have a specific dashboard layout) -->
     <Header v-if="authStore.isAuthenticated && authStore.user?.role !== 'etudiant'" />
 
     <!-- Contenu -->
     <main :class="['min-h-screen p-4 sm:p-6 lg:p-8 flex items-center justify-center', {'pt-[90px]': authStore.user?.role !== 'etudiant'}]">
-      <div class="w-full h-full max-w-[1400px]">
+      <div class="w-full max-w-7xl">
         <RouterView v-slot="{ Component }">
           <transition name="fade" mode="out-in">
             <component :is="Component" />

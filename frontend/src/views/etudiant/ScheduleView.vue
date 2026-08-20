@@ -36,7 +36,7 @@ const getStyle = (cls) => {
 const getColor = (cls) => colorMap[cls.type] || 'bg-white/5 border-white/10 text-gray-200';
 
 const getCoursesForDay = (dayIndex) => {
-  return schedule.value.filter(c => c.dayOfWeek === dayIndex);
+  return schedule.value.filter(c => c.dayOfWeek === dayIndex + 1);
 };
 </script>
 
@@ -99,8 +99,8 @@ const getCoursesForDay = (dayIndex) => {
             <!-- Courses from API -->
             <RouterLink
               v-for="cls in getCoursesForDay(dayIndex)"
-              :key="cls._id"
-              :to="`/etudiant/course/${cls._id}`"
+              :key="cls.id"
+              :to="`/etudiant/course/${cls.id}`"
               class="absolute w-[calc(100%-12px)] left-[6px] rounded-xl border p-3 flex flex-col shadow-sm transition-all duration-200 hover:shadow-lg hover:scale-[1.02] hover:z-10 cursor-pointer overflow-hidden block"
               :class="getColor(cls)"
               :style="getStyle(cls)"

@@ -97,6 +97,11 @@ const routes = [
         path: "settings",
         name: "EtudiantSettings",
         component: () => import("../views/etudiant/SettingsView.vue"),
+      },
+      {
+        path: "notifications",
+        name: "EtudiantNotifications",
+        component: () => import("../components/Notification.vue"),
       }
     ]
   },

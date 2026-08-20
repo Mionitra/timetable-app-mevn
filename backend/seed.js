@@ -2,444 +2,152 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 
-import User from "./src/Models/User.js";
-import Subject from "./src/Models/Subject.js";
-import Course from "./src/Models/Course.js";
-import Enrollment from "./src/Models/Enrollment.js";
-
 dotenv.config();
+
+import AcademicYear from "./src/Models/AcademicYear.js";
+import Semester from "./src/Models/Semester.js";
+import Enrollment from "./src/Models/Enrollment.js";
+import User from "./src/Models/User.js";
+import Group from "./src/Models/Group.js";
+import Salle from "./src/Models/Salle.js";
+import Subject from "./src/Models/Subject.js";
+import Indisponibilite from "./src/Models/Indisponibilite.js";
+import Cours from "./src/Models/Cours.js";
+import Alerte from "./src/Models/Alerte.js";
 
 const seed = async () => {
   try {
-    // ============================================================
-    // CONNEXION MONGODB
-    // ============================================================
-
     if (!process.env.MONGO_URI) {
-      throw new Error("MONGO_URI n'est pas défini dans le fichier .env");
+      throw new Error("MONGO_URI n'est pas défini dans .env");
     }
-
     await mongoose.connect(process.env.MONGO_URI);
+    console.log("MongoDB connecté pour le seed");
 
-    console.log("✅ MongoDB connecté pour le seed");
-
-    // ============================================================
-    // NETTOYAGE DES DONNÉES
-    // ============================================================
-
+    await Alerte.deleteMany({});
     await Enrollment.deleteMany({});
-    await Course.deleteMany({});
+    await Cours.deleteMany({});
+    await Indisponibilite.deleteMany({});
     await Subject.deleteMany({});
+    await Salle.deleteMany({});
+    await User.deleteMany({});
+    await Group.deleteMany({});
+    await Semester.deleteMany({});
+    await AcademicYear.deleteMany({});
 
-    // On supprime uniquement les comptes de démonstration.
-    // Les comptes créés avec Register sont conservés.
-    const seedEmails = [
-      "admin@gmail.com",
-      "enseignant@gmail.com",
-      "enseignant2@gmail.com",
-      "etudiant@gmail.com",
-    ];
+    console.log(" Anciennes données supprimées");
 
-    await User.deleteMany({
-      email: { $in: seedEmails },
+    const year = await AcademicYear.create({
+      name: "2025-2026",
+      start_date: new Date("2025-09-01"),
+      end_date: new Date("2026-06-30"),
+      is_current: true
     });
+    console.log("Année académique créée:", year.name);
 
-    console.log("🧹 Anciennes données de démonstration supprimées");
-
-    // ============================================================
-    // MOTS DE PASSE
-    // ============================================================
-
-    const adminPassword = "12345678";
-    const teacherPassword = "12345678";
-    const studentPassword = "12345678";
-
-    // Hash des mots de passe
-    const [adminPw, teacherPw, studentPw] = await Promise.all([
-      bcrypt.hash(adminPassword, 10),
-      bcrypt.hash(teacherPassword, 10),
-      bcrypt.hash(studentPassword, 10),
+    const [s1, s2] = await Semester.insertMany([
+      { academic_year_id: year._id, name: "Semestre 1", start_date: new Date("2025-09-01"), end_date: new Date("2025-12-20") },
+      { academic_year_id: year._id, name: "Semestre 2", start_date: new Date("2026-01-10"), end_date: new Date("2026-05-30") }
     ]);
+    console.log("Semestres créés:", s1.name, s2.name);
 
-    // ============================================================
-    // ADMIN
-    // ============================================================
+    const groups = await Group.insertMany([
+      { name: "L1", study_level: "L1", department: "Général", academic_year_id: year._id },
+      { name: "L2 GL", study_level: "L2", department: "GL", academic_year_id: year._id },
+      { name: "L2 ARSB", study_level: "L2", department: "ARSB", academic_year_id: year._id },
+      { name: "L2 AID", study_level: "L2", department: "AID", academic_year_id: year._id },
+      { name: "L3 GL", study_level: "L3", department: "GL", academic_year_id: year._id },
+      { name: "L3 ARSB", study_level: "L3", department: "ARSB", academic_year_id: year._id },
+      { name: "L3 AID", study_level: "L3", department: "AID", academic_year_id: year._id }
+    ]);
+    const getGroup = (name) => groups.find(g => g.name === name);
+    console.log("🏫 Groupes créés :", groups.length);
+
+    const hash = await bcrypt.hash("12345678", 10);
 
     const admin = await User.create({
-      firstName: "Admin",
-      lastName: "Principal",
-      email: "admin@gmail.com",
-      password: adminPw,
-      role: "admin",
-      isActive: true,
+      first_name: "Admin", last_name: "Principal", email: "admin@gmail.com",
+      password_hash: hash, role: "admin", is_active: true
     });
 
-    console.log("👑 Admin créé :", admin.email);
+    const [teacher1, teacher2] = await User.insertMany([
+      { first_name: "Jean", last_name: "Rakoto", email: "enseignant1@gmail.com", password_hash: hash, role: "enseignant", teacher_type: "permanent", discipline: "informatique", is_active: true },
+      { first_name: "Marie", last_name: "Andriamaro", email: "enseignant2@gmail.com", password_hash: hash, role: "enseignant", teacher_type: "vacataire", discipline: "mathematiques", is_active: true }
+    ]);
 
-    // ============================================================
-    // ENSEIGNANT 1
-    // ============================================================
+    const [student1, student2, student3] = await User.insertMany([
+      { first_name: "Fidy", last_name: "Razafy", email: "etudiant1@gmail.com", password_hash: hash, role: "etudiant", student_id: "STU001", group_id: getGroup("L2 GL")._id, join_date: new Date("2025-09-01"), is_active: true },
+      { first_name: "Lala", last_name: "Ratsimbazafy", email: "etudiant2@gmail.com", password_hash: hash, role: "etudiant", student_id: "STU002", group_id: getGroup("L2 ARSB")._id, join_date: new Date("2025-09-01"), is_active: true },
+      { first_name: "Tia", last_name: "Randria", email: "etudiant3@gmail.com", password_hash: hash, role: "etudiant", student_id: "STU003", group_id: getGroup("L3 GL")._id, join_date: new Date("2025-09-01"), is_active: true }
+    ]);
+    console.log("👤 Utilisateurs créés :", 6);
 
-    const teacher = await User.create({
-      firstName: "Jean",
-      lastName: "Rakoto",
-      email: "enseignant@gmail.com",
-      password: teacherPw,
-      role: "enseignant",
-      typeEnseignant: "permanent",
-      discipline: "informatique",
-      isActive: true,
-    });
-
-    console.log("👨‍🏫 Enseignant créé :", teacher.email);
-
-    // ============================================================
-    // ENSEIGNANT 2
-    // ============================================================
-
-    const teacher2 = await User.create({
-      firstName: "Marie",
-      lastName: "Andriamaro",
-      email: "enseignant2@gmail.com",
-      password: teacherPw,
-      role: "enseignant",
-      typeEnseignant: "vacataire",
-      discipline: "mathematiques",
-      isActive: true,
-    });
-
-    console.log("👩‍🏫 Enseignant 2 créé :", teacher2.email);
-
-    // ============================================================
-    // ETUDIANT
-    // ============================================================
-
-    const student = await User.create({
-      firstName: "Fidy",
-      lastName: "Razafy",
-      email: "etudiant@gmail.com",
-      password: studentPw,
-      role: "etudiant",
-      niveau: "L2",
-      filiere: "GL",
-      isActive: true,
-    });
-
-    console.log("🎓 Étudiant créé :", student.email);
-
-    console.log("👤 Tous les utilisateurs de démonstration sont créés");
-
-    // ============================================================
-    // SUBJECTS
-    // ============================================================
+    const salles = await Salle.insertMany([
+      { name: "Amphi A", capacite: 120, batiment: "Bâtiment A" },
+      { name: "Amphi B", capacite: 100, batiment: "Bâtiment A" },
+      { name: "Salle TD1", capacite: 40, batiment: "Bâtiment B" },
+      { name: "Salle Info B204", capacite: 25, batiment: "Bâtiment B" },
+      { name: "Salle TP", capacite: 30, batiment: "Bâtiment C" }
+    ]);
+    const getSalle = (name) => salles.find(s => s.name === name);
+    console.log("🏢 Salles créées :", salles.length);
 
     const subjects = await Subject.insertMany([
-      {
-        name: "Base de données",
-        code: "INF301",
-        credits: 4,
-        color: "blue",
-        description:
-          "Introduction aux systèmes de gestion de bases de données relationnelles et NoSQL.",
-        teacher: teacher._id,
-      },
-
-      {
-        name: "Algorithmique & Structures de données",
-        code: "INF302",
-        credits: 6,
-        color: "purple",
-        description:
-          "Conception et analyse d'algorithmes, structures de données avancées.",
-        teacher: teacher._id,
-      },
-
-      {
-        name: "Développement Web Avancé",
-        code: "INF303",
-        credits: 5,
-        color: "emerald",
-        description:
-          "Frameworks modernes, API REST, Vue.js, Node.js.",
-        teacher: teacher._id,
-      },
-
-      {
-        name: "Mathématiques Appliquées",
-        code: "MAT301",
-        credits: 5,
-        color: "amber",
-        description:
-          "Statistiques, probabilités et mathématiques discrètes.",
-        teacher: teacher2._id,
-      },
-
-      {
-        name: "Réseaux Informatiques",
-        code: "INF304",
-        credits: 4,
-        color: "rose",
-        description:
-          "Protocoles réseaux, architecture TCP/IP, sécurité.",
-        teacher: teacher._id,
-      },
-
-      {
-        name: "Anglais Technique",
-        code: "LAN301",
-        credits: 2,
-        color: "indigo",
-        description:
-          "Communication technique en anglais pour l'informatique.",
-        teacher: teacher2._id,
-      },
+      { name: "Base de données", code: "INF301", credits: 4, duree: 120, description: "Introduction aux SGBD relationnels et NoSQL.", color: "blue", semester_id: s1._id, user_id: teacher1._id },
+      { name: "Algorithmique & Structures", code: "INF302", credits: 6, duree: 120, description: "Conception d'algorithmes, structures avancées.", color: "purple", semester_id: s1._id, user_id: teacher1._id },
+      { name: "Développement Web Avancé", code: "INF303", credits: 5, duree: 120, description: "Frameworks modernes, API REST, Vue.js, Node.js.", color: "emerald", semester_id: s2._id, user_id: teacher1._id },
+      { name: "Mathématiques Appliquées", code: "MAT301", credits: 5, duree: 120, description: "Statistiques, probabilités, mathématiques discrètes.", color: "amber", semester_id: s1._id, user_id: teacher2._id },
+      { name: "Réseaux Informatiques", code: "INF304", credits: 4, duree: 120, description: "Protocoles, architecture TCP/IP, sécurité.", color: "rose", semester_id: s2._id, user_id: teacher1._id },
+      { name: "Anglais Technique", code: "LAN301", credits: 2, duree: 90, description: "Communication technique en anglais pour l'informatique.", color: "indigo", semester_id: s1._id, user_id: teacher2._id }
     ]);
-
+    const getSub = (code) => subjects.find(s => s.code === code);
     console.log("📚 Matières créées :", subjects.length);
 
-    // ============================================================
-    // DATES DES COURS
-    // ============================================================
-
-    const today = new Date();
-
-    today.setHours(0, 0, 0, 0);
-
-    const makeDateForDay = (dayIndex) => {
-      const d = new Date(today);
-
-
-      const currentDay =
-        d.getDay() === 0
-          ? 7
-          : d.getDay();
-
-
-      const targetDay = dayIndex + 1;
-
-      const diff = targetDay - currentDay;
-
-      d.setDate(d.getDate() + diff);
-
-      return d;
-    };
-
-    // ============================================================
-    // COURSES
-    // ============================================================
-
-    await Course.insertMany([
-      // ----------------------------------------------------------
-      // LUNDI
-      // ----------------------------------------------------------
-
-      {
-        subject: subjects[0]._id,
-        teacher: teacher._id,
-        type: "CM",
-        courseDate: makeDateForDay(0),
-        startTime: "08:00",
-        endTime: "10:00",
-        dayOfWeek: 0,
-        room: "Amphi A",
-        building: "Bâtiment A",
-        status: "upcoming",
-        description:
-          "Introduction aux bases de données relationnelles",
-      },
-
-      {
-        subject: subjects[1]._id,
-        teacher: teacher._id,
-        type: "TD",
-        courseDate: makeDateForDay(0),
-        startTime: "10:30",
-        endTime: "12:30",
-        dayOfWeek: 0,
-        room: "Salle TD1",
-        building: "Bâtiment B",
-        status: "upcoming",
-        description:
-          "Exercices sur les tris et recherches",
-      },
-
-      {
-        subject: subjects[2]._id,
-        teacher: teacher._id,
-        type: "TP",
-        courseDate: makeDateForDay(0),
-        startTime: "14:00",
-        endTime: "16:00",
-        dayOfWeek: 0,
-        room: "Salle Info B204",
-        building: "Bâtiment B",
-        status: "upcoming",
-        description:
-          "Création d'une API REST avec Node.js",
-      },
-
-      // ----------------------------------------------------------
-      // MARDI
-      // ----------------------------------------------------------
-
-      {
-        subject: subjects[4]._id,
-        teacher: teacher._id,
-        type: "CM",
-        courseDate: makeDateForDay(1),
-        startTime: "09:00",
-        endTime: "11:00",
-        dayOfWeek: 1,
-        room: "Amphi B",
-        building: "Bâtiment A",
-        status: "upcoming",
-        description:
-          "Protocoles réseau : TCP/IP, UDP",
-      },
-
-      {
-        subject: subjects[3]._id,
-        teacher: teacher2._id,
-        type: "TD",
-        courseDate: makeDateForDay(1),
-        startTime: "14:00",
-        endTime: "16:00",
-        dayOfWeek: 1,
-        room: "Salle TD3",
-        building: "Bâtiment C",
-        status: "upcoming",
-        description:
-          "Probabilités et statistiques descriptives",
-      },
-
-      // ----------------------------------------------------------
-      // MERCREDI
-      // ----------------------------------------------------------
-
-      {
-        subject: subjects[0]._id,
-        teacher: teacher._id,
-        type: "TP",
-        courseDate: makeDateForDay(2),
-        startTime: "08:00",
-        endTime: "12:00",
-        dayOfWeek: 2,
-        room: "Salle Info A101",
-        building: "Bâtiment A",
-        status: "upcoming",
-        description:
-          "TP MongoDB et requêtes NoSQL",
-      },
-
-      // ----------------------------------------------------------
-      // JEUDI
-      // ----------------------------------------------------------
-
-      {
-        subject: subjects[5]._id,
-        teacher: teacher2._id,
-        type: "TD",
-        courseDate: makeDateForDay(3),
-        startTime: "13:00",
-        endTime: "15:00",
-        dayOfWeek: 3,
-        room: "Salle Langue",
-        building: "Bâtiment D",
-        status: "upcoming",
-        description:
-          "Technical English: Writing API documentation",
-      },
-
-      {
-        subject: subjects[1]._id,
-        teacher: teacher._id,
-        type: "CM",
-        courseDate: makeDateForDay(3),
-        startTime: "15:30",
-        endTime: "17:30",
-        dayOfWeek: 3,
-        room: "Amphi A",
-        building: "Bâtiment A",
-        status: "upcoming",
-        description:
-          "Algorithmes de graphes : Dijkstra, BFS, DFS",
-      },
-
-      // ----------------------------------------------------------
-      // VENDREDI
-      // ----------------------------------------------------------
-
-      {
-        subject: subjects[3]._id,
-        teacher: teacher2._id,
-        type: "CM",
-        courseDate: makeDateForDay(4),
-        startTime: "10:00",
-        endTime: "12:00",
-        dayOfWeek: 4,
-        room: "Amphi C",
-        building: "Bâtiment A",
-        status: "upcoming",
-        description:
-          "Mathématiques discrètes : combinatoire",
-      },
-
-      {
-        subject: subjects[2]._id,
-        teacher: teacher._id,
-        type: "TP",
-        courseDate: makeDateForDay(4),
-        startTime: "14:00",
-        endTime: "16:00",
-        dayOfWeek: 4,
-        room: "Salle Info B204",
-        building: "Bâtiment B",
-        status: "upcoming",
-        description:
-          "Intégration Vue.js avec une API REST",
-      },
+    await Indisponibilite.insertMany([
+      { user_id: teacher1._id, day_of_week: 2, start_time: "14:00", end_time: "16:00", start_date: new Date("2025-09-01"), end_date: new Date("2025-12-20") },
+      { user_id: teacher1._id, day_of_week: 5, start_time: "08:00", end_time: "10:00", start_date: new Date("2025-09-01"), end_date: new Date("2025-12-20") },
+      { user_id: teacher2._id, day_of_week: 3, start_time: "13:00", end_time: "15:00", start_date: new Date("2025-09-01"), end_date: new Date("2025-12-20") }
     ]);
+    console.log("⛔ Indisponibilités créées");
 
-    console.log("📅 Emploi du temps créé : 10 cours");
+    const coursData = [
+      { subject_id: getSub("INF301")._id, teacher_id: teacher1._id, group_id: getGroup("L2 GL")._id, salle_id: getSalle("Amphi A")._id, day_of_week: 1, start_time: "08:00", end_time: "10:00", start_date: new Date("2025-09-01"), end_date: new Date("2025-12-20"), type: "CM", description: "Introduction aux bases de données" },
+      { subject_id: getSub("INF302")._id, teacher_id: teacher1._id, group_id: getGroup("L2 GL")._id, salle_id: getSalle("Salle TD1")._id, day_of_week: 1, start_time: "10:30", end_time: "12:30", start_date: new Date("2025-09-01"), end_date: new Date("2025-12-20"), type: "TD", description: "Exercices tris et recherches" },
+      { subject_id: getSub("INF304")._id, teacher_id: teacher1._id, group_id: getGroup("L2 ARSB")._id, salle_id: getSalle("Amphi B")._id, day_of_week: 2, start_time: "09:00", end_time: "11:00", start_date: new Date("2025-09-01"), end_date: new Date("2025-12-20"), type: "CM", description: "Protocoles TCP/IP, UDP" },
+      { subject_id: getSub("INF301")._id, teacher_id: teacher1._id, group_id: getGroup("L2 GL")._id, salle_id: getSalle("Salle Info B204")._id, day_of_week: 3, start_time: "08:00", end_time: "12:00", start_date: new Date("2025-09-01"), end_date: new Date("2025-12-20"), type: "TP", description: "TP MongoDB et requêtes NoSQL" },
+      { subject_id: getSub("LAN301")._id, teacher_id: teacher2._id, group_id: getGroup("L2 GL")._id, salle_id: getSalle("Salle TD1")._id, day_of_week: 4, start_time: "13:00", end_time: "15:00", start_date: new Date("2025-09-01"), end_date: new Date("2025-12-20"), type: "TD", description: "Technical English: API documentation" },
+      { subject_id: getSub("INF302")._id, teacher_id: teacher1._id, group_id: getGroup("L3 GL")._id, salle_id: getSalle("Amphi A")._id, day_of_week: 4, start_time: "15:30", end_time: "17:30", start_date: new Date("2025-09-01"), end_date: new Date("2025-12-20"), type: "CM", description: "Algorithmes de graphes : Dijkstra, BFS, DFS" },
+      { subject_id: getSub("MAT301")._id, teacher_id: teacher2._id, group_id: getGroup("L2 ARSB")._id, salle_id: getSalle("Amphi A")._id, day_of_week: 5, start_time: "10:00", end_time: "12:00", start_date: new Date("2025-09-01"), end_date: new Date("2025-12-20"), type: "CM", description: "Combinatoire et probabilités" },
+      { subject_id: getSub("INF303")._id, teacher_id: teacher1._id, group_id: getGroup("L3 GL")._id, salle_id: getSalle("Salle Info B204")._id, day_of_week: 5, start_time: "14:00", end_time: "16:00", start_date: new Date("2025-09-01"), end_date: new Date("2025-12-20"), type: "TP", description: "Intégration Vue.js avec API REST" }
+    ];
+    const createdCours = await Cours.insertMany(coursData);
+    console.log(`📅 ${createdCours.length} cours créés`);
 
-    // ============================================================
-    // ENROLLMENTS
-    // ============================================================
+    await Enrollment.insertMany([
+      { student_id: student1._id, subject_id: getSub("INF301")._id },
+      { student_id: student1._id, subject_id: getSub("INF302")._id },
+      { student_id: student1._id, subject_id: getSub("MAT301")._id },
+      { student_id: student1._id, subject_id: getSub("LAN301")._id },
+      { student_id: student2._id, subject_id: getSub("INF304")._id },
+      { student_id: student2._id, subject_id: getSub("MAT301")._id },
+      { student_id: student3._id, subject_id: getSub("INF302")._id },
+      { student_id: student3._id, subject_id: getSub("INF303")._id },
+      { student_id: student3._id, subject_id: getSub("INF304")._id }
+    ]);
+    console.log("Inscriptions créées");
 
-    const allStudents = await User.find({
-      role: "etudiant",
-    });
-
-    const enrollmentsToInsert = [];
-
-    for (const stu of allStudents) {
-      for (const sub of subjects) {
-        enrollmentsToInsert.push({
-          student: stu._id,
-          subject: sub._id,
-        });
-      }
-    }
-
-    if (enrollmentsToInsert.length > 0) {
-      await Enrollment.insertMany(enrollmentsToInsert);
-    }
-
-    console.log(
-      `📝 ${enrollmentsToInsert.length} inscriptions créées`
-    );
+    await Alerte.insertMany([
+      { type: "salle_occupee", message: "La salle Amphi A est déjà occupée pour le créneau 08:00-10:00 le lundi.", cours_id: createdCours[0]._id, salle_id: getSalle("Amphi A")._id, is_read: false },
+      { type: "prof_indisponible", message: "L'enseignant Jean Rakoto est indisponible le mardi de 14h à 16h.", user_id: teacher1._id, is_read: false }
+    ]);
+    console.log("Alertes créées");
 
     await mongoose.connection.close();
-
+    console.log("Seed terminé avec succès !");
     process.exit(0);
 
   } catch (error) {
-    console.error("");
-    console.error("❌ ERREUR LORS DU SEED");
-    console.error(error);
-
+    console.error("ERREUR SEED :", error.message);
     await mongoose.connection.close();
-
     process.exit(1);
   }
 };

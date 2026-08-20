@@ -1,51 +1,50 @@
 import mongoose from "mongoose";
-
+subjects
 const subjectSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
       trim: true,
+      maxlength: 255,
     },
-
     code: {
       type: String,
-      required: true,
       unique: true,
-      uppercase: true,
-      trim: true,
+      required: true,
+      maxlength: 20,
     },
-
     credits: {
       type: Number,
-      default: 0,
-      min: 0,
+      required: true,
     },
-
-    color: {
-      type: String,
-      default: "blue",
+    duree: {
+      type: Number,
+      required: true,
     },
-
     description: {
       type: String,
-      default: "",
-    },
-
-    teacher: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
       default: null,
     },
+    color: {
+      type: String,
+      maxlength: 20,
+      default: null,
+    },
+    semester_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Semester",
+      default: null,
+    },
+    user_id: {
+
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: { createdAt: "created_at", updatedAt: false } }
 );
 
-subjectSchema.index({ code: 1 });
-subjectSchema.index({ teacher: 1 });
-
 const Subject = mongoose.model("Subject", subjectSchema);
-
 export default Subject;
