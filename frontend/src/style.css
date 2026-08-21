@@ -3,16 +3,20 @@
 @theme {
   --color-primary: #0D737D;
   --color-secondary: #01173F;
-  --color-background: #FFFFFF;
   --color-gt-bg: #0b0f19;
   --color-gt-card: #13182b;
   --color-gt-blue: #2563eb;
   --color-gt-blue-glow: rgba(37, 99, 235, 0.5);
   --color-gt-gray: #1e243b;
 }
-
 @layer base {
   body {
-    @apply bg-background text-secondary;
+    @apply text-secondary;
+    background-image: url("./assets/bg.jpeg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
   }
 }

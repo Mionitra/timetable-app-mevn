@@ -16,7 +16,7 @@ const course = ref({
    building: 'Bâtiment B - 1er Étage',
    teacher: 'Prof. Lemoine',
    color: 'purple',
-   status: 'upcoming', // 'completed', 'ongoing', 'upcoming', 'cancelled'
+   status: 'upcoming',
    description: 'Séance de travaux dirigés portant sur les arbres binaires de recherche (ABR). Exercices pratiques d\'insertion, de suppression et de parcours (préfixe, infixe, suffixe).',
    materials: [
       { id: 1, name: 'Feuille TD 1.pdf', size: '150 KB' },
@@ -88,9 +88,9 @@ const goBack = () => {
       <!-- Info Grid -->
       <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
          <!-- Location & Details -->
-         <div class="p-6 space-y-6 border border-white/5 shadow-lg bg-gt-card rounded-[2rem]">
+         <div class="p-6 space-y-6 border border-white/5 shadow-lg bg-white/5 rounded-[2rem]">
             <div class="flex items-start gap-4">
-               <div class="p-3 text-gray-400 bg-gt-bg border border-white/5 rounded-xl shrink-0">
+               <div class="p-3 text-gray-400 border bg-gt-bg border-white/5 rounded-xl shrink-0">
                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
@@ -108,7 +108,7 @@ const goBack = () => {
             <div class="h-px bg-white/5"></div>
 
             <div class="flex items-start gap-4">
-               <div class="p-3 text-gray-400 bg-gt-bg border border-white/5 rounded-xl shrink-0">
+               <div class="p-3 text-gray-400 border bg-gt-bg border-white/5 rounded-xl shrink-0">
                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
@@ -123,13 +123,13 @@ const goBack = () => {
 
          <!-- Description & Materials -->
          <div class="space-y-6">
-            <div class="p-6 border border-white/5 shadow-lg bg-gt-card rounded-[2rem]">
+            <div class="p-6 border border-white/5 shadow-lg bg-white/5 rounded-[2rem]">
                <h3 class="mb-3 text-lg font-bold text-white">Programme de la séance</h3>
                <p class="text-sm leading-relaxed text-gray-300">{{ course.description }}</p>
             </div>
 
             <div v-if="course.materials && course.materials.length > 0"
-               class="p-6 border border-white/5 shadow-lg bg-gt-card rounded-[2rem]">
+               class="p-6 border border-white/5 shadow-lg bg-white/5 rounded-[2rem]">
                <h3 class="flex items-center gap-2 mb-4 text-lg font-bold text-white">
                   <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -140,7 +140,7 @@ const goBack = () => {
                </h3>
                <ul class="space-y-2">
                   <li v-for="doc in course.materials" :key="doc.id"
-                     class="flex items-center justify-between p-3 transition-colors border rounded-xl cursor-pointer bg-white/5 hover:bg-white/10 border-white/5 group">
+                     class="flex items-center justify-between p-3 transition-colors border cursor-pointer rounded-xl bg-white/5 hover:bg-white/10 border-white/5 group">
                      <div class="flex items-center gap-3">
                         <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

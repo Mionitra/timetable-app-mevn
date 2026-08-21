@@ -1,7 +1,10 @@
-import User from "../Models/User.js";
-import Cours from "../Models/Cours.js";
-import Subject from "../Models/Subject.js";
-import Enrollment from "../Models/Enrollment.js";
+import {
+  User,
+  Cours,
+  Subject,
+  Enrollment,
+}
+  from "../Models/index.js";
 
 // =====================================================
 // GET PROFILE
@@ -42,7 +45,7 @@ export const updateProfile = async (req, res) => {
 
     const updateData = {};
     if (firstName) updateData.first_name = firstName.trim();
-    if (lastName)  updateData.last_name  = lastName.trim();
+    if (lastName) updateData.last_name = lastName.trim();
 
     if (Object.keys(updateData).length === 0) {
       return res.status(400).json({ message: "Aucune donnée à mettre à jour" });

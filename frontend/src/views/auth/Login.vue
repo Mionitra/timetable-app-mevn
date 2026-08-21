@@ -41,12 +41,12 @@ const handleLogin = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen flex justify-center items-center bg-background">
-    <div class="w-full max-w-md p-8 bg-white rounded-xl shadow-2xl border border-gray-200">
+  <div class="flex items-center justify-center min-h-screen bg-background">
+    <div class="w-full max-w-md p-8 border border-gray-200 shadow-2xl bg-white/5 rounded-xl backdrop-blur-md">
 
-      <h1 class="text-3xl font-bold text-center text-secondary mb-2">Connexion</h1>
+      <h1 class="mb-2 text-3xl font-bold text-center text-secondary">Connexion</h1>
 
-      <p class="text-center text-gray-500 mb-8">
+      <p class="mb-8 text-center text-gray-500">
         Connectez-vous à votre compte
       </p>
 
@@ -59,7 +59,7 @@ const handleLogin = async () => {
             v-model="email"
             type="email"
             placeholder="exemple@gmail.com"
-            class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-secondary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+            class="w-full p-3 placeholder-gray-400 transition-all border border-gray-300 rounded-lg bg-gray-50/5 text-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             required
           />
         </div>
@@ -71,14 +71,14 @@ const handleLogin = async () => {
             v-model="password"
             type="password"
             placeholder="********"
-            class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-secondary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+            class="w-full p-3 placeholder-gray-400 transition-all border border-gray-300 rounded-lg bg-gray-50/5 text-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             required
           />
         </div>
 
         <p
           v-if="authStore.error"
-          class="text-red-400 text-sm font-medium"
+          class="text-sm font-medium text-red-400"
         >
           {{ authStore.error }}
         </p>
@@ -86,7 +86,7 @@ const handleLogin = async () => {
         <button
           type="submit"
           :disabled="authStore.loading"
-          class="w-full py-3 bg-primary hover:opacity-90 text-white font-semibold rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          class="w-full py-3 font-semibold text-white transition-colors rounded-lg bg-primary hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {{
             authStore.loading
@@ -100,7 +100,7 @@ const handleLogin = async () => {
       <p class="mt-6 text-center text-gray-500">
         Vous n'avez pas de compte ?
 
-        <RouterLink to="/inscription" class="text-primary hover:opacity-80 font-medium ml-1">
+        <RouterLink to="/inscription" class="ml-1 font-medium text-primary hover:opacity-80">
           Créer un compte
         </RouterLink>
       </p>

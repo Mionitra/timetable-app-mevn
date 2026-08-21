@@ -44,7 +44,7 @@ const getTeacherInitials = (teacher) => {
 
 <template>
    <div class="space-y-6">
-      <div class="flex flex-col justify-between gap-4 p-6 border border-white/5 shadow-lg sm:flex-row sm:items-center bg-gt-card rounded-[2rem]">
+      <div class="flex flex-col justify-between gap-4 p-6 border border-white/5 shadow-lg sm:flex-row sm:items-center bg-white/5 rounded-[2rem]">
          <div class="flex items-center gap-4">
             <div class="p-3 border bg-blue-500/10 rounded-xl border-blue-500/20">
                <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -74,8 +74,8 @@ const getTeacherInitials = (teacher) => {
       <!-- Loading State -->
       <div v-if="etudiantStore.loading" class="flex items-center justify-center py-20">
         <div class="text-center">
-          <div class="w-10 h-10 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mx-auto mb-3"></div>
-          <p class="text-gray-400 text-sm">Chargement des matières...</p>
+          <div class="w-10 h-10 mx-auto mb-3 border-4 rounded-full border-blue-500/30 border-t-blue-500 animate-spin"></div>
+          <p class="text-sm text-gray-400">Chargement des matières...</p>
         </div>
       </div>
 
@@ -85,11 +85,11 @@ const getTeacherInitials = (teacher) => {
           :to="`/etudiant/subjects/${subject._id}`"
           v-for="(subject, index) in filteredSubjects"
           :key="subject._id"
-          class="group block relative overflow-hidden rounded-[2rem] border border-white/5 bg-gt-card hover:-translate-y-1 transition-transform duration-300"
+          class="group block relative overflow-hidden rounded-[2rem] border border-white/5 bg-white/5 hover:-translate-y-1 transition-transform duration-300"
         >
           <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[80%] h-24 bg-gt-blue/0 group-hover:bg-gt-blue/30 blur-[40px] pointer-events-none transition-colors duration-500"></div>
 
-          <div class="relative h-full p-6 flex flex-col z-10">
+          <div class="relative z-10 flex flex-col h-full p-6">
             <div class="relative z-10 flex flex-col h-full">
                <div class="flex items-start justify-between mb-5">
                   <span
@@ -111,7 +111,7 @@ const getTeacherInitials = (teacher) => {
                </h3>
 
                <div class="flex items-center gap-4 pt-6 mt-auto border-t border-white/5">
-                  <div class="flex items-center justify-center w-10 h-10 border border-white/10 rounded-full shadow-inner bg-gt-bg shrink-0">
+                  <div class="flex items-center justify-center w-10 h-10 border rounded-full shadow-inner border-white/10 bg-gt-bg shrink-0">
                      <span class="text-sm font-bold text-gray-300">{{ getTeacherInitials(subject.teacher) }}</span>
                   </div>
                   <div>
@@ -125,8 +125,8 @@ const getTeacherInitials = (teacher) => {
       </div>
 
       <!-- Empty State -->
-      <div v-else-if="!etudiantStore.loading" class="p-12 text-center border border-white/5 bg-gt-card rounded-[2rem]">
-         <div class="inline-flex items-center justify-center w-16 h-16 mb-4 bg-white/5 rounded-full">
+      <div v-else-if="!etudiantStore.loading" class="p-12 text-center border border-white/5 bg-white/5 rounded-[2rem]">
+         <div class="inline-flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-white/5">
             <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -138,7 +138,7 @@ const getTeacherInitials = (teacher) => {
          <p class="text-gray-400">
            {{ searchQuery ? `Aucune matière ne correspond à "${searchQuery}".` : 'Vos matières apparaîtront ici une fois que vous serez inscrit(e).' }}
          </p>
-         <button v-if="searchQuery" @click="searchQuery = ''" class="px-4 py-2 mt-4 text-sm font-medium text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700">
+         <button v-if="searchQuery" @click="searchQuery = ''" class="px-4 py-2 mt-4 text-sm font-medium text-white transition-colors bg-primary hover:opacity-90">
            Réinitialiser la recherche
          </button>
       </div>

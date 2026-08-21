@@ -351,4 +351,4 @@ INSERT INTO enrollments (student_id, subject_id) VALUES
 -- ----------------------------------------------------------------
 INSERT INTO alertes (type, message, cours_id, salle_id, user_id, is_read) VALUES
 ('salle_occupee', 'La salle Amphi A est déjà occupée pour le créneau 08:00-10:00 le lundi.', 1, @salle_a, NULL, FALSE),
-('prof_indisponible', 'L''enseignant Jean Rakoto est indisponible le mardi de 14h à 16h.', NULL, NULL, @teacher1_id, FALSE);+
+('prof_indisponible', 'L''enseignant Jean Rakoto est indisponible le mardi de 14h à 16h.', NULL, NULL, @teacher1_id, FALSE);

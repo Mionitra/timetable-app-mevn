@@ -35,13 +35,45 @@ const routes = [
 
   {
     path: "/admin",
-    name: "AdminDashboard",
     component: AdminDashboard,
-
-    meta: {
-      requiresAuth: true,
-      role: "admin",
-    },
+    meta: { requiresAuth: true, role: "admin" },
+    children: [
+      {
+        path: "",
+        name: "AdminOverview",
+        component: () => import("../views/admin/AdminOverview.vue"),
+      },
+      {
+        path: "enseignants",
+        name: "AdminEnseignants",
+        component: () => import("../views/admin/EnseignantsView.vue"),
+      },
+      {
+        path: "salles",
+        name: "AdminSalles",
+        component: () => import("../views/admin/SallesView.vue"),
+      },
+      {
+        path: "academic-years",
+        name: "AdminAcademicYears",
+        component: () => import("../views/admin/AcademicYearsView.vue"),
+      },
+      {
+        path: "semestres",
+        name: "AdminSemestres",
+        component: () => import("../views/admin/SemestresView.vue"),
+      },
+      {
+        path: "matieres",
+        name: "AdminMatieres",
+        component: () => import("../views/admin/MatieresView.vue"),
+      },
+      {
+        path: "cours",
+        name: "AdminCours",
+        component: () => import("../views/admin/CoursView.vue"),
+      },
+    ],
   },
 
   {

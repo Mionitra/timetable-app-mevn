@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-subjects
+
 const subjectSchema = new mongoose.Schema(
   {
     name: {

@@ -1,6 +1,8 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import User from "../Models/User.js";
+import {
+  User
+} from "../Models/index.js";
 
 // ===============================
 // REGISTER
@@ -39,31 +41,31 @@ export const register = async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 10);
 
     const user = await User.create({
-      first_name:   firstName.trim(),
-      last_name:    lastName.trim(),
-      email:        email.toLowerCase().trim(),
+      first_name: firstName.trim(),
+      last_name: lastName.trim(),
+      email: email.toLowerCase().trim(),
       password_hash: passwordHash,
-      role:         userRole,
+      role: userRole,
       // Champs étudiant
-      niveau:       userRole === "etudiant" ? (niveau || null) : null,
-      filiere:      userRole === "etudiant" ? (filiere || null) : null,
+      niveau: userRole === "etudiant" ? (niveau || null) : null,
+      filiere: userRole === "etudiant" ? (filiere || null) : null,
       // Photos
       profileImage: profileImage || null,
-      coverImage:   coverImage   || null,
+      coverImage: coverImage || null,
       // Optionnels
-      student_id:   studentId || undefined,
-      group_id:     groupId   || null,
-      join_date:    new Date(),
+      student_id: studentId || undefined,
+      group_id: groupId || null,
+      join_date: new Date(),
     });
 
     return res.status(201).json({
       message: "Inscription réussie",
       user: {
-        id:        user._id,
+        id: user._id,
         firstName: user.first_name,
-        lastName:  user.last_name,
-        email:     user.email,
-        role:      user.role,
+        lastName: user.last_name,
+        email: user.email,
+        role: user.role,
       },
     });
 
@@ -86,7 +88,7 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Email et mot de passe obligatoires" });
     }
 
-    email    = email.toLowerCase().trim();
+    email = email.toLowerCase().trim();
     password = password.trim();
 
     // Chercher l'utilisateur (password_hash est select:false, on le demande explicitement)
@@ -113,11 +115,11 @@ export const login = async (req, res) => {
       message: "Connexion réussie",
       token,
       user: {
-        id:        user._id,
+        id: user._id,
         firstName: user.first_name,
-        lastName:  user.last_name,
-        email:     user.email,
-        role:      user.role,
+        lastName: user.last_name,
+        email: user.email,
+        role: user.role,
       },
     });
 

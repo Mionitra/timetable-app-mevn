@@ -25,26 +25,26 @@ const stats = computed(() => etudiantStore.dashboard.stats);
          <!-- Filters -->
          <div class="flex items-center gap-3">
             <button
-               class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-300 transition-colors border rounded-full bg-gt-card border-white/5 hover:bg-white/5">
+               class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-300 transition-colors border rounded-full bg-white/5 border-white/5 hover:bg-white/5">
                <span class="w-2 h-2 bg-green-500 rounded-full"></span> To do <svg class="w-3 h-3 text-gray-500"
                   fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                </svg>
             </button>
             <button
-               class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-300 transition-colors border rounded-full bg-gt-card border-white/5 hover:bg-white/5">
+               class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-300 transition-colors border rounded-full bg-white/5 border-white/5 hover:bg-white/5">
                Work <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                </svg>
             </button>
             <button
-               class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-300 transition-colors border rounded-full bg-gt-card border-white/5 hover:bg-white/5">
+               class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-300 transition-colors border rounded-full bg-white/5 border-white/5 hover:bg-white/5">
                High priority <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                </svg>
             </button>
             <button
-               class="p-2 text-gray-400 transition-colors border rounded-full bg-gt-card border-white/5 hover:text-white">
+               class="p-2 text-gray-400 transition-colors border rounded-full bg-white/5 border-white/5 hover:text-white">
                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                      d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4">
@@ -65,7 +65,7 @@ const stats = computed(() => etudiantStore.dashboard.stats);
          <!-- Left Column (Tasks/Meetings) -->
          <div class="space-y-4 lg:col-span-2">
             <!-- Regular Task Card 1 -->
-            <div v-if="todayClasses.length > 0" class="p-6 border bg-gt-card border-white/5 rounded-3xl">
+            <div v-if="todayClasses.length > 0" class="p-6 border bg-white/5 border-white/5 rounded-3xl">
                <div class="flex items-center gap-2 mb-2">
                   <span class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]"></span>
                   <span class="text-xs font-semibold tracking-wider text-green-500 uppercase">Today</span>
@@ -114,7 +114,7 @@ const stats = computed(() => etudiantStore.dashboard.stats);
             </div>
 
             <!-- Highlighted Glowing Task Card -->
-            <div v-if="nextClass" class="relative p-6 overflow-hidden border bg-gt-card border-white/5 rounded-3xl">
+            <div v-if="nextClass" class="relative p-6 overflow-hidden border bg-white/5 border-white/5 rounded-3xl">
                <!-- Glow background -->
                <div
                   class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[80%] h-24 bg-gt-blue/40 blur-[40px] pointer-events-none">
@@ -187,7 +187,7 @@ const stats = computed(() => etudiantStore.dashboard.stats);
             </div>
 
             <!-- Regular Task Card 2 -->
-            <div v-if="todayClasses.length > 1" class="p-6 border bg-gt-card border-white/5 rounded-3xl">
+            <div v-if="todayClasses.length > 1" class="p-6 border bg-white/5 border-white/5 rounded-3xl">
                <div class="flex items-center gap-2 mb-2">
                   <span class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]"></span>
                   <span class="text-xs font-semibold tracking-wider text-green-500 uppercase">Today</span>
@@ -284,7 +284,7 @@ const stats = computed(() => etudiantStore.dashboard.stats);
             </div>
 
             <!-- My files widget -->
-            <div class="p-6 border bg-gt-card border-white/5 rounded-3xl">
+            <div class="p-6 border bg-white/5 border-white/5 rounded-3xl">
                <div class="flex items-center justify-between mb-6">
                   <h3 class="text-lg font-bold text-white">My files</h3>
                   <button class="p-1.5 rounded-full bg-white/5 text-gray-400 hover:text-white"><svg class="w-4 h-4"
@@ -326,7 +326,7 @@ const stats = computed(() => etudiantStore.dashboard.stats);
             </div>
 
             <!-- Activity Widget -->
-            <div class="relative p-6 overflow-hidden border bg-gt-card border-white/5 rounded-3xl">
+            <div class="relative p-6 overflow-hidden border bg-white/5 border-white/5 rounded-3xl">
                <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[60%] h-12 bg-gt-blue/30 blur-[30px]"></div>
 
                <div class="relative z-10 flex items-start justify-between mb-6">

@@ -39,44 +39,44 @@ const goBack = () => {
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto space-y-6 pb-12">
+  <div class="max-w-5xl pb-12 mx-auto space-y-6">
     <!-- Back Button -->
-    <button @click="goBack" class="inline-flex items-center text-sm font-medium text-gray-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 px-4 py-2 rounded-xl border border-white/5">
+    <button @click="goBack" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-400 transition-colors border hover:text-white bg-white/5 hover:bg-white/10 rounded-xl border-white/5">
       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
       Retour aux matières
     </button>
 
     <!-- Header Banner -->
-    <div :class="`bg-${subject.color}-900/20 border border-${subject.color}-500/30`" class="rounded-3xl p-8 relative overflow-hidden shadow-2xl backdrop-blur-xl">
-       <div :class="`bg-${subject.color}-500/20`" class="absolute -right-20 -top-20 w-64 h-64 rounded-full blur-3xl"></div>
-       <div :class="`bg-${subject.color}-400/10`" class="absolute -left-10 -bottom-10 w-40 h-40 rounded-full blur-2xl"></div>
+    <div :class="`bg-${subject.color}-900/20 border border-${subject.color}-500/30`" class="relative p-8 overflow-hidden shadow-2xl rounded-3xl backdrop-blur-xl">
+       <div :class="`bg-${subject.color}-500/20`" class="absolute w-64 h-64 rounded-full -right-20 -top-20 blur-3xl"></div>
+       <div :class="`bg-${subject.color}-400/10`" class="absolute w-40 h-40 rounded-full -left-10 -bottom-10 blur-2xl"></div>
        
        <div class="relative z-10">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <div class="flex flex-col justify-between gap-4 mb-4 sm:flex-row sm:items-center">
              <div class="flex items-center gap-3">
-                <span :class="`bg-${subject.color}-500 text-white`" class="px-3 py-1 rounded-lg text-sm font-bold tracking-widest shadow-lg">
+                <span :class="`bg-${subject.color}-500 text-white`" class="px-3 py-1 text-sm font-bold tracking-widest rounded-lg shadow-lg">
                    {{ subject.code }}
                 </span>
-                <span class="text-sm font-medium text-gray-300 bg-white/5 px-3 py-1 rounded-lg border border-white/10">
+                <span class="px-3 py-1 text-sm font-medium text-gray-300 border rounded-lg bg-white/5 border-white/10">
                    {{ subject.credits }} Crédits ECTS
                 </span>
              </div>
           </div>
           
-          <h1 class="text-4xl font-extrabold text-white mb-6 leading-tight">{{ subject.name }}</h1>
+          <h1 class="mb-6 text-4xl font-extrabold leading-tight text-white">{{ subject.name }}</h1>
           
-          <div class="flex flex-col sm:flex-row sm:items-center gap-6 border-t border-white/5 pt-6">
+          <div class="flex flex-col gap-6 pt-6 border-t sm:flex-row sm:items-center border-white/5">
              <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-full bg-gt-bg border-2 border-white/10 flex items-center justify-center shrink-0">
+                <div class="flex items-center justify-center w-12 h-12 border-2 rounded-full bg-gt-bg border-white/10 shrink-0">
                    <span class="text-lg font-bold text-gray-300">{{ subject.teacher.charAt(0) }}{{ subject.teacher.split(' ')[1]?.charAt(0) || '' }}</span>
                 </div>
                 <div>
                    <p class="text-xs uppercase tracking-wider text-gray-400 font-semibold mb-0.5">Enseignant</p>
-                   <p class="text-base text-white font-medium">{{ subject.teacher }}</p>
+                   <p class="text-base font-medium text-white">{{ subject.teacher }}</p>
                 </div>
              </div>
              
-             <div class="hidden sm:block w-px h-10 bg-white/10"></div>
+             <div class="hidden w-px h-10 sm:block bg-white/10"></div>
              
              <div>
                  <p class="text-xs uppercase tracking-wider text-gray-400 font-semibold mb-0.5">Contact</p>
@@ -90,29 +90,29 @@ const goBack = () => {
     </div>
 
     <!-- Content Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
        <!-- Main Details -->
-       <div class="lg:col-span-2 space-y-8">
+       <div class="space-y-8 lg:col-span-2">
           
           <!-- Description -->
-          <div class="bg-gt-card border border-white/5 rounded-3xl p-6 shadow-lg">
-             <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+          <div class="p-6 border shadow-lg bg-white/5 border-white/5 rounded-3xl">
+             <h2 class="flex items-center gap-2 mb-4 text-xl font-bold text-white">
                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 Description du cours
              </h2>
-             <p class="text-gray-300 leading-relaxed">{{ subject.description }}</p>
+             <p class="leading-relaxed text-gray-300">{{ subject.description }}</p>
           </div>
           
           <!-- Objectives -->
-          <div class="bg-gt-card border border-white/5 rounded-3xl p-6 shadow-lg">
-             <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+          <div class="p-6 border shadow-lg bg-white/5 border-white/5 rounded-3xl">
+             <h2 class="flex items-center gap-2 mb-4 text-xl font-bold text-white">
                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
                 Objectifs pédagogiques
              </h2>
              <ul class="space-y-3">
                 <li v-for="(obj, i) in subject.objectives" :key="i" class="flex items-start gap-3">
-                   <div class="mt-1 w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0 border border-blue-500/30">
-                      <div class="w-2 h-2 rounded-full bg-blue-400"></div>
+                   <div class="flex items-center justify-center w-5 h-5 mt-1 border rounded-full bg-blue-500/20 shrink-0 border-blue-500/30">
+                      <div class="w-2 h-2 bg-blue-400 rounded-full"></div>
                    </div>
                    <span class="text-gray-300">{{ obj }}</span>
                 </li>
@@ -120,9 +120,9 @@ const goBack = () => {
           </div>
           
           <!-- Resources -->
-          <div class="bg-gt-card border border-white/5 rounded-3xl p-6 shadow-lg">
+          <div class="p-6 border shadow-lg bg-white/5 border-white/5 rounded-3xl">
              <div class="flex items-center justify-between mb-6">
-                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <h2 class="flex items-center gap-2 text-xl font-bold text-white">
                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                    Ressources du cours
                 </h2>
@@ -130,19 +130,19 @@ const goBack = () => {
              </div>
              
              <div class="space-y-3">
-                <div v-for="res in subject.resources" :key="res.id" class="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors group cursor-pointer">
+                <div v-for="res in subject.resources" :key="res.id" class="flex items-center justify-between p-4 transition-colors border cursor-pointer rounded-xl bg-white/5 border-white/10 hover:bg-white/10 group">
                    <div class="flex items-center gap-4">
-                      <div class="p-2 rounded-lg bg-gt-bg border border-white/5">
+                      <div class="p-2 border rounded-lg bg-gt-bg border-white/5">
                          <svg v-if="res.type === 'pdf'" class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                          <svg v-else-if="res.type === 'doc'" class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                          <svg v-else class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
                       </div>
                       <div>
-                         <h4 class="text-gray-200 font-medium group-hover:text-white transition-colors">{{ res.name }}</h4>
+                         <h4 class="font-medium text-gray-200 transition-colors group-hover:text-white">{{ res.name }}</h4>
                          <p class="text-xs text-gray-500 mt-0.5">Ajouté le {{ res.date }} &bull; {{ res.size }}</p>
                       </div>
                    </div>
-                   <button class="p-2 text-gray-400 hover:text-white bg-white/5 hover:bg-blue-600 rounded-lg transition-colors border border-transparent hover:border-blue-500">
+                   <button class="p-2 text-gray-400 transition-colors border border-transparent rounded-lg hover:text-white bg-white/5 hover:bg-blue-600 hover:border-blue-500">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                    </button>
                 </div>
@@ -153,16 +153,16 @@ const goBack = () => {
        <!-- Sidebar Widgets -->
        <div class="space-y-8">
           <!-- Next Classes Widget -->
-          <div class="bg-gt-card border border-white/5 rounded-3xl p-6 shadow-lg">
-             <h2 class="text-lg font-bold text-white mb-5 flex items-center gap-2">
+          <div class="p-6 border shadow-lg bg-white/5 border-white/5 rounded-3xl">
+             <h2 class="flex items-center gap-2 mb-5 text-lg font-bold text-white">
                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                 Prochaines séances
              </h2>
              
              <div class="space-y-4">
-                <RouterLink :to="`/etudiant/course/${cls.id}`" v-for="cls in subject.nextClasses" :key="cls.id" class="block p-4 rounded-xl bg-white/5 border border-white/10 hover:border-blue-500/50 transition-colors group">
-                   <div class="flex justify-between items-start mb-2">
-                      <span class="text-sm font-semibold text-white group-hover:text-blue-400 transition-colors">{{ cls.date }}</span>
+                <RouterLink :to="`/etudiant/course/${cls.id}`" v-for="cls in subject.nextClasses" :key="cls.id" class="block p-4 transition-colors border rounded-xl bg-white/5 border-white/10 hover:border-blue-500/50 group">
+                   <div class="flex items-start justify-between mb-2">
+                      <span class="text-sm font-semibold text-white transition-colors group-hover:text-blue-400">{{ cls.date }}</span>
                       <span :class="{'bg-blue-500/20 text-blue-400': cls.type === 'CM', 'bg-purple-500/20 text-purple-400': cls.type === 'TD', 'bg-green-500/20 text-green-400': cls.type === 'TP'}" class="px-2 py-0.5 text-xs font-bold rounded border border-transparent">
                          {{ cls.type }}
                       </span>
@@ -180,7 +180,7 @@ const goBack = () => {
                 </RouterLink>
              </div>
              
-             <RouterLink to="/etudiant/schedule" class="block w-full text-center mt-4 text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors">
+             <RouterLink to="/etudiant/schedule" class="block w-full mt-4 text-sm font-medium text-center text-blue-400 transition-colors hover:text-blue-300">
                 Voir l'emploi du temps complet &rarr;
              </RouterLink>
           </div>

@@ -44,7 +44,7 @@ const saveSettings = () => {
             Paramètres
          </h1>
          <button @click="saveSettings" :disabled="isSaving"
-            class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:opacity-70 text-white font-medium rounded-xl transition-colors shadow-lg shadow-blue-900/20 flex items-center gap-2">
+            class="px-6 py-2.5 bg-primary hover:opacity-90 disabled:opacity-70 text-white font-medium rounded-xl transition-colors shadow-lg shadow-blue-900/20 flex items-center gap-2">
             <svg v-if="isSaving" class="w-4 h-4 mr-2 -ml-1 text-white animate-spin" xmlns="http://www.w3.org/2000/svg"
                fill="none" viewBox="0 0 24 24">
                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
