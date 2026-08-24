@@ -47,9 +47,10 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
 
+    // Un compte étudiant est inactif jusqu'à validation par l'admin (RF-AUTH-01)
     isActive: {
       type: Boolean,
-      default: true,
+      default: false,
     },
 
     // =====================================================
@@ -82,6 +83,12 @@ const userSchema = new mongoose.Schema(
       sparse: true,
       trim: true,
       maxlength: 50,
+    },
+
+    groupId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Group",
+      default: null,
     },
 
     niveau: {
@@ -174,14 +181,7 @@ const userSchema = new mongoose.Schema(
 // INDEX
 // =========================================================
 
-// userSchema.index({ email: 1 });
-// userSchema.index({ role: 1 });
-// userSchema.index({ studentId: 1 });
-// userSchema.index({ niveau: 1, filiere: 1 });
-// userSchema.index({
-//   typeEnseignant: 1,
-//   discipline: 1,
-// });
+userSchema.index({ role: 1, isActive: 1 }); // liste "étudiants en attente d'activation"
 
 // =========================================================
 // MODEL

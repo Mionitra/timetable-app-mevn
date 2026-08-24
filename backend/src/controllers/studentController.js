@@ -1,19 +1,68 @@
-import Course from "../Models/Course.js";
-import Subject from "../Models/Subject.js";
-import Enrollment from "../Models/Enrollment.js";
 import User from "../Models/User.js";
+import Cours from "../Models/Cours.js";
+import { SLOTS, getISOWeek } from "../config/slots.js";
+
+// =====================================================
+// HELPER : formater un cours publié pour l'espace étudiant.
+// Les horaires affichés sont dérivés du référentiel fixe
+// de créneaux (aucune donnée temporelle libre en base).
+// =====================================================
+const formatCours = (c) => {
+  const slot = SLOTS.find((s) => s.index === c.slotIndex);
+
+  return {
+    id: c._id,
+    dayOfWeek: c.dayOfWeek,
+    slotIndex: c.slotIndex,
+    startTime: slot ? slot.startTime : null,
+    endTime: slot ? slot.endTime : null,
+    type: c.type,
+    room: c.salleId ? c.salleId.name : "Non définie",
+    subject: c.subjectId
+      ? { id: c.subjectId._id, name: c.subjectId.name, semester: c.subjectId.semester }
+      : null,
+    salle: c.salleId
+      ? { id: c.salleId._id, name: c.salleId.name }
+      : null,
+    teacher: c.teacherId
+      ? {
+          id: c.teacherId._id,
+          firstName: c.teacherId.firstName,
+          lastName: c.teacherId.lastName,
+        }
+      : null,
+  };
+};
 
 // =====================================================
 // GET PROFILE
 // =====================================================
 export const getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
-    if (!user) return res.status(404).json({ message: "Utilisateur introuvable" });
-    res.status(200).json(user);
+    const user = await User.findById(req.user.id)
+      .select("-password")
+      .populate("groupId", "name promotion");
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur introuvable" });
+    }
+
+    return res.status(200).json({
+      id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role,
+      studentId: user.studentId,
+      joinDate: user.joinDate,
+      niveau: user.niveau,
+      filiere: user.filiere,
+      group: user.groupId || null,
+      createdAt: user.createdAt,
+    });
   } catch (error) {
     console.error("Profile Error:", error);
-    res.status(500).json({ message: "Erreur serveur" });
+    return res.status(500).json({ message: "Erreur serveur" });
   }
 };
 
@@ -22,113 +71,115 @@ export const getProfile = async (req, res) => {
 // =====================================================
 export const updateProfile = async (req, res) => {
   try {
-    const { firstName, lastName, phone, bio, address, profileImage, coverImage } = req.body;
+    const {
+      firstName,
+      lastName,
+      phone,
+      bio,
+      address,
+      profileImage,
+      coverImage,
+    } = req.body;
+
+    const updateData = {};
+    if (firstName !== undefined) updateData.firstName = firstName.trim();
+    if (lastName !== undefined) updateData.lastName = lastName.trim();
+    if (phone !== undefined) updateData.phone = phone;
+    if (bio !== undefined) updateData.bio = bio;
+    if (address !== undefined) updateData.address = address;
+    if (profileImage !== undefined) updateData.profileImage = profileImage;
+    if (coverImage !== undefined) updateData.coverImage = coverImage;
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ message: "Aucune donnée à mettre à jour" });
+    }
+
     const user = await User.findByIdAndUpdate(
       req.user.id,
-      { firstName, lastName, phone, bio, address, profileImage, coverImage },
-      { new: true, runValidators: true }
+      updateData,
+      { new: true, runValidators: true, select: "-password" }
     );
-    if (!user) return res.status(404).json({ message: "Utilisateur introuvable" });
-    res.status(200).json({ message: "Profil mis à jour", user });
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur introuvable" });
+    }
+
+    return res.status(200).json({
+      message: "Profil mis à jour",
+      user: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+      },
+    });
   } catch (error) {
     console.error("Update Profile Error:", error);
-    res.status(500).json({ message: "Erreur serveur" });
+    return res.status(500).json({ message: "Erreur serveur" });
   }
 };
 
 // =====================================================
-// HELPER: Get Subjects
-// =====================================================
-const getStudentSubjectIds = async (studentId) => {
-  const enrollments = await Enrollment.find({ student: studentId });
-  return enrollments.map((e) => e.subject);
-};
-
-// =====================================================
-// GET DASHBOARD OVERVIEW
+// GET DASHBOARD
+// Aperçu du jour : cours PUBLIÉS du groupe de l'étudiant
+// (groupe dérivé du token, RF-STUD-02)
 // =====================================================
 export const getDashboard = async (req, res) => {
   try {
-    const studentId = req.user.id;
-    const subjectIds = await getStudentSubjectIds(studentId);
+    const student = await User.findById(req.user.id).select("groupId");
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    if (!student || !student.groupId) {
+      return res.status(200).json({
+        todayClasses: [],
+        nextClass: null,
+        stats: { totalSubjects: 0 },
+      });
+    }
 
-    // Get today's classes
-    const todayClasses = await Course.find({
-      subject: { $in: subjectIds },
-      courseDate: { $gte: today, $lt: tomorrow },
+    // Jour courant ISO (1=lundi … 7=dimanche)
+    const jsDay = new Date().getDay(); // 0=dim, 1=lun ... 6=sam
+    const dayOfWeek = jsDay === 0 ? 7 : jsDay;
+
+    const { weekNumber, year } = getISOWeek(new Date());
+
+    // Seuls les cours publiés sont visibles (section 2.1 RBAC)
+    const todayCours = await Cours.find({
+      groupId: student.groupId,
+      isPublished: true,
+      weekNumber,
+      year,
+      dayOfWeek,
     })
-      .populate("subject", "name code color")
-      .populate("teacher", "firstName lastName")
-      .sort({ startTime: 1 });
+      .populate("subjectId", "name semester")
+      .populate("salleId", "name")
+      .populate("teacherId", "firstName lastName")
+      .sort({ slotIndex: 1 });
 
-    // Next class (first upcoming class today)
-    const nowTimeStr = new Date().toTimeString().slice(0, 5); // "HH:MM"
+    const formatted = todayCours.map(formatCours);
+
+    // Prochain cours = premier cours dont l'heure de début est à venir
+    const currentTime = new Date().toTimeString().slice(0, 5); // "HH:MM"
     const nextClass =
-      todayClasses.find((c) => c.startTime >= nowTimeStr) ||
-      todayClasses[0] ||
+      formatted.find((c) => c.startTime && c.startTime >= currentTime) ||
+      formatted[0] ||
       null;
 
-    res.status(200).json({
-      todayClasses,
+    // Nombre de matières distinctes publiées cette semaine
+    const distinctSubjects = await Cours.distinct("subjectId", {
+      groupId: student.groupId,
+      isPublished: true,
+      weekNumber,
+      year,
+    });
+
+    return res.status(200).json({
+      todayClasses: formatted,
       nextClass,
-      stats: {
-        completedTasks: 13,
-        totalSubjects: subjectIds.length,
-      },
+      stats: { totalSubjects: distinctSubjects.length },
     });
   } catch (error) {
     console.error("Dashboard Error:", error);
-    res.status(500).json({ message: "Erreur serveur", error: error.message });
-  }
-};
-
-// =====================================================
-// GET SCHEDULE (COURSES)
-// =====================================================
-export const getSchedule = async (req, res) => {
-  try {
-    const studentId = req.user.id;
-    const subjectIds = await getStudentSubjectIds(studentId);
-
-    // Get all courses for these subjects (ideally you'd filter by week)
-    const courses = await Course.find({
-      subject: { $in: subjectIds },
-    })
-      .populate("subject", "name code color")
-      .populate("teacher", "firstName lastName");
-
-    res.status(200).json(courses);
-  } catch (error) {
-    console.error("Schedule Error:", error);
-    res.status(500).json({ message: "Erreur serveur", error: error.message });
-  }
-};
-
-// =====================================================
-// GET SUBJECTS
-// =====================================================
-export const getSubjects = async (req, res) => {
-  try {
-    const studentId = req.user.id;
-
-    const enrollments = await Enrollment.find({ student: studentId }).populate({
-      path: "subject",
-      populate: {
-        path: "teacher",
-        select: "firstName lastName",
-      },
-    });
-
-    const subjects = enrollments.map((e) => e.subject).filter(Boolean);
-
-    res.status(200).json(subjects);
-  } catch (error) {
-    console.error("Subjects Error:", error);
-    res.status(500).json({ message: "Erreur serveur", error: error.message });
+    return res.status(500).json({ message: "Erreur serveur", error: error.message });
   }
 };

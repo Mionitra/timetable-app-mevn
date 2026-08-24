@@ -1,8 +1,6 @@
 import express from "express";
 import {
   getDashboard,
-  getSchedule,
-  getSubjects,
   getProfile,
   updateProfile,
 } from "../controllers/studentController.js";
@@ -17,12 +15,6 @@ router.use(authorize("etudiant"));
 
 // GET /api/student/dashboard
 router.get("/dashboard", getDashboard);
-
-// GET /api/student/schedule
-router.get("/schedule", getSchedule);
-
-// GET /api/student/subjects
-router.get("/subjects", getSubjects);
 
 // GET /api/student/profile
 router.get("/profile", getProfile);
