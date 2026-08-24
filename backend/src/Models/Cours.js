@@ -68,6 +68,14 @@ const coursSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+
+    // Identifiant de séquence partagé par les N documents d'un même
+    // cours s'étalant sur des créneaux successifs (ex: CM de 2h = 2
+    // créneaux). Null pour un cours simple (1 créneau).
+    sequenceId: {
+      type: String,
+      default: null,
+    },
   },
   {
     timestamps: true,
@@ -85,6 +93,10 @@ coursSchema.index({ teacherId: 1, isPublished: 1 });
 
 // Vue "planning étudiant / grille admin par groupe"
 coursSchema.index({ groupId: 1, year: 1, weekNumber: 1 });
+
+// Manipulation des blocs multi-créneaux (édition / suppression
+// de toute la séquence en une opération)
+coursSchema.index({ sequenceId: 1 }, { sparse: true });
 
 // Filet de sécurité base : une même salle ne peut jamais avoir
 // deux cours sur le même créneau (conflits enseignant/groupe

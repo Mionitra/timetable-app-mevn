@@ -17,6 +17,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
+import { randomUUID } from "node:crypto";
 
 import User from "./src/Models/User.js";
 import Group from "./src/Models/Group.js";
@@ -518,6 +519,9 @@ const seed = async () => {
 
     /**
      * Fabrique un objet cours complet (tous les champs du schéma).
+     * `duration > 1` génère un bloc de créneaux successifs : N
+     * documents partageant le même sequenceId, comme le ferait
+     * l'API POST /api/slots.
      */
     const buildCours = ({
       dayOfWeek,
@@ -528,23 +532,38 @@ const seed = async () => {
       teacherId,
       salleId,
       isPublished = true,
-    }) => ({
-      weekNumber,
-      year,
-      groupId,
-      subjectId,
-      teacherId,
-      salleId,
-      dayOfWeek,
-      slotIndex,
-      type,
-      isPublished,
-    });
+      duration = 1,
+    }) => {
+      const base = {
+        weekNumber,
+        year,
+        groupId,
+        subjectId,
+        teacherId,
+        salleId,
+        dayOfWeek,
+        type,
+        isPublished,
+      };
+
+      if (duration <= 1) {
+        return [{ ...base, slotIndex }];
+      }
+
+      const sequenceId = randomUUID();
+
+      return Array.from({ length: duration }, (_, offset) => ({
+        ...base,
+        slotIndex: slotIndex + offset,
+        sequenceId,
+      }));
+    };
 
     const coursList = [
       // ================= L3-GL-A =================
 
-      // Lundi : CM Base de données (Amphi A)
+      // Lundi : CM Base de données (Amphi A) — bloc de 2 créneaux
+      // successifs (démonstration multi-créneaux)
       buildCours({
         dayOfWeek: 1,
         slotIndex: 2,
@@ -553,6 +572,7 @@ const seed = async () => {
         subjectId: bd,
         teacherId: teacherJean._id,
         salleId: amphiA,
+        duration: 2,
       }),
 
       // Lundi : TD Algorithmique
@@ -702,7 +722,7 @@ const seed = async () => {
         teacherId: teacherMarie._id,
         salleId: tdC102,
       }),
-    ];
+    ].flat();
 
     // Filet de sécurité : mêmes règles que le conflictChecker
     // applicatif — le seed ne doit JAMAIS créer de conflit.
@@ -733,9 +753,13 @@ const seed = async () => {
     await Cours.insertMany(coursList);
 
     const drafts = coursList.filter((c) => !c.isPublished).length;
+    const blocs = new Set(
+      coursList.filter((c) => c.sequenceId).map((c) => c.sequenceId)
+    ).size;
     console.log(
       `📅 Emploi du temps créé : ${coursList.length} cours ` +
-        `(${coursList.length - drafts} publiés, ${drafts} brouillons)`
+        `(${coursList.length - drafts} publiés, ${drafts} brouillons)` +
+        (blocs > 0 ? `, dont ${blocs} bloc(s) multi-créneaux` : "")
     );
 
     // --------------------------------------------------------

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { randomUUID } from "node:crypto";
 import Cours from "../Models/Cours.js";
 import Group from "../Models/Group.js";
 import Matiere from "../Models/Matiere.js";
@@ -20,7 +21,7 @@ const isValidObjectId = (value) =>
  * ou null si le payload est cohérent.
  */
 const validateSlotPayload = (
-  { weekNumber, year, dayOfWeek, slotIndex, type },
+  { weekNumber, year, dayOfWeek, slotIndex, type, duration },
   { partial = false } = {}
 ) => {
   if (!partial || weekNumber !== undefined) {
@@ -48,6 +49,25 @@ const validateSlotPayload = (
       return "Le type de cours doit être CM, TD ou TP";
     }
   }
+  if (duration !== undefined) {
+    // Optionnel : nombre de créneaux successifs (cours bloqués sur
+    // plusieurs heures). Validé seulement s'il est fourni.
+    if (!isPositiveInt(duration) || duration < 1 || duration > 10) {
+      return "La durée doit être un entier entre 1 et 10 créneaux";
+    }
+  }
+  return null;
+};
+
+/**
+ * Normalise la durée d'un cours (créneaux successifs) et vérifie
+ * que la plage ne déborde pas de la journée (créneau max = 10).
+ * Retourne un message d'erreur ou null.
+ */
+const validateDurationRange = (slotIndex, duration) => {
+  if (slotIndex + duration - 1 > 10) {
+    return "Le cours s'étend au-delà du dernier créneau de la journée";
+  }
   return null;
 };
 
@@ -63,6 +83,7 @@ const formatCours = (c) => {
     slotIndex: c.slotIndex,
     type: c.type,
     isPublished: c.isPublished,
+    sequenceId: c.sequenceId ?? null,
     group: c.groupId
       ? { id: c.groupId._id, name: c.groupId.name }
       : null,
@@ -117,16 +138,26 @@ export const checkConflict = async (req, res) => {
       year,
       dayOfWeek,
       slotIndex,
+      duration,
       groupId,
       subjectId,
       teacherId,
       salleId,
       excludeId,
+      excludeIds,
     } = req.body;
 
     const validationError = validateSlotPayload(req.body);
     if (validationError) {
       return res.status(400).json({ message: validationError });
+    }
+
+    const effectiveDuration =
+      isPositiveInt(duration) && duration >= 1 ? duration : 1;
+
+    const rangeError = validateDurationRange(slotIndex, effectiveDuration);
+    if (rangeError) {
+      return res.status(400).json({ message: rangeError });
     }
 
     if (!isValidObjectId(groupId) || !isValidObjectId(teacherId) || !isValidObjectId(salleId)) {
@@ -135,15 +166,24 @@ export const checkConflict = async (req, res) => {
       });
     }
 
+    // IDs à exclure : liste moderne excludeIds, fallback legacy excludeId
+    let idsToExclude = [];
+    if (Array.isArray(excludeIds)) {
+      idsToExclude = excludeIds.filter(isValidObjectId);
+    } else if (isValidObjectId(excludeId)) {
+      idsToExclude = [excludeId];
+    }
+
     const conflicts = await checkConflicts({
       weekNumber,
       year,
       dayOfWeek,
       slotIndex,
+      duration: effectiveDuration,
       salleId,
       teacherId,
       groupId,
-      excludeId: isValidObjectId(excludeId) ? excludeId : null,
+      excludeIds: idsToExclude,
     });
 
     return res.status(200).json({ conflicts });
@@ -170,11 +210,21 @@ export const createSlot = async (req, res) => {
       teacherId,
       salleId,
       isPublished,
+      duration,
     } = req.body;
 
     const validationError = validateSlotPayload(req.body);
     if (validationError) {
       return res.status(400).json({ message: validationError });
+    }
+
+    // Créneaux successifs : durée par défaut = 1 créneau
+    const effectiveDuration =
+      isPositiveInt(duration) && duration >= 1 ? duration : 1;
+
+    const rangeError = validateDurationRange(slotIndex, effectiveDuration);
+    if (rangeError) {
+      return res.status(400).json({ message: rangeError });
     }
 
     if (
@@ -201,12 +251,14 @@ export const createSlot = async (req, res) => {
     }
 
     // Règle absolue : aucune écriture ne peut créer un conflit,
-    // brouillon ou publié confondus (section 2.6)
+    // brouillon ou publié confondus (section 2.6). Vérification sur
+    // TOUTE la plage de créneaux successifs.
     const conflicts = await checkConflicts({
       weekNumber,
       year,
       dayOfWeek,
       slotIndex,
+      duration: effectiveDuration,
       salleId,
       teacherId,
       groupId,
@@ -220,38 +272,73 @@ export const createSlot = async (req, res) => {
       });
     }
 
-    const cours = await Cours.create({
+    // Un bloc multi-créneaux = N documents partageant le même
+    // sequenceId ; un cours simple reste sans sequenceId (null).
+    const sequenceId =
+      effectiveDuration > 1 ? randomUUID() : null;
+
+    const baseDoc = {
       weekNumber,
       year,
       dayOfWeek,
-      slotIndex,
       type,
       groupId,
       subjectId,
       teacherId,
       salleId,
       isPublished: isPublished === true,
-    });
+      sequenceId,
+    };
 
-    const populated = await Cours.findById(cours._id).populate(
-      POPULATE_FIELDS
-    );
+    const docs = Array.from({ length: effectiveDuration }, (_, offset) => ({
+      ...baseDoc,
+      slotIndex: slotIndex + offset,
+    }));
 
-    return res.status(201).json({
-      message: "Cours créé avec succès",
-      cours: formatCours(populated),
-    });
-  } catch (error) {
-    if (error.code === 11000) {
-      return res.status(409).json({
-        error: "SCHEDULE_CONFLICT",
-        message: "Salle déjà occupée à ce créneau",
-        conflicts: [
-          { type: "SALLE", message: "Salle déjà occupée à ce créneau" },
-        ],
+    try {
+      const inserted = await Cours.insertMany(docs);
+
+      const populated = await Cours.findById(inserted[0]._id).populate(
+        POPULATE_FIELDS
+      );
+
+      return res.status(201).json({
+        message:
+          effectiveDuration > 1
+            ? `Cours créé sur ${effectiveDuration} créneaux successifs`
+            : "Cours créé avec succès",
+        cours: formatCours(populated),
       });
-    }
+    } catch (insertError) {
+      if (insertError.code === 11000) {
+        // Course aux créneaux perdue entre le check et l'insert :
+        // nettoyage du bloc partiel pour ne pas laisser de tronc.
+        if (sequenceId) {
+          await Cours.deleteMany({ sequenceId });
+        } else {
+          await Cours.deleteOne({
+            weekNumber,
+            year,
+            dayOfWeek,
+            slotIndex,
+            salleId,
+          });
+        }
 
+        return res.status(409).json({
+          error: "SCHEDULE_CONFLICT",
+          message: "Salle déjà occupée sur l'un des créneaux",
+          conflicts: [
+            {
+              type: "SALLE",
+              message: "Salle déjà occupée sur l'un des créneaux",
+            },
+          ],
+        });
+      }
+      throw insertError;
+    }
+  } catch (error) {
     console.error("CreateSlot Error:", error);
     return res.status(500).json({ message: "Erreur serveur" });
   }
@@ -259,7 +346,10 @@ export const createSlot = async (req, res) => {
 
 // =====================================================
 // PUT /api/slots/:id (admin)
-// Modification avec contrôle de conflits (hors soi-même)
+// Modification avec contrôle de conflits (hors soi-même).
+// Multi-créneaux : modifier n'importe quel document d'un bloc
+// met à jour TOUTE la séquence (matière, enseignant, salle,
+// type, publication). La durée reste inchangée.
 // =====================================================
 export const updateSlot = async (req, res) => {
   try {
@@ -268,6 +358,18 @@ export const updateSlot = async (req, res) => {
     if (!existing) {
       return res.status(404).json({ message: "Cours introuvable" });
     }
+
+    // Résolution du bloc complet si le cours appartient à une
+    // séquence de créneaux successifs
+    const sequenceFilter = existing.sequenceId
+      ? { sequenceId: existing.sequenceId }
+      : { _id: existing._id };
+
+    const sequenceDocs = await Cours.find(sequenceFilter).sort({
+      slotIndex: 1,
+    });
+
+    const excludeIds = sequenceDocs.map((doc) => doc._id.toString());
 
     const payload = {
       weekNumber: req.body.weekNumber ?? existing.weekNumber,
@@ -286,15 +388,14 @@ export const updateSlot = async (req, res) => {
       return res.status(400).json({ message: validationError });
     }
 
-    if (
-      !isValidObjectId(payload.groupId) ||
-      !isValidObjectId(payload.subjectId) ||
-      !isValidObjectId(payload.teacherId) ||
-      !isValidObjectId(payload.salleId)
-    ) {
-      return res.status(400).json({
-        message: "Références invalides",
-      });
+    // Le bloc occupe `sequenceDocs.length` créneaux consécutifs :
+    // re-vérification sur toute la plage hors documents édités.
+    const rangeError = validateDurationRange(
+      payload.slotIndex,
+      sequenceDocs.length
+    );
+    if (rangeError) {
+      return res.status(400).json({ message: rangeError });
     }
 
     const referenceError = await validateReferences(payload);
@@ -304,7 +405,8 @@ export const updateSlot = async (req, res) => {
 
     const conflicts = await checkConflicts({
       ...payload,
-      excludeId: existing._id.toString(),
+      duration: sequenceDocs.length,
+      excludeIds,
     });
 
     if (conflicts.length > 0) {
@@ -315,18 +417,26 @@ export const updateSlot = async (req, res) => {
       });
     }
 
-    Object.assign(existing, payload, {
+    const sharedUpdate = {
+      type: payload.type,
+      groupId: payload.groupId,
+      subjectId: payload.subjectId,
+      teacherId: payload.teacherId,
+      salleId: payload.salleId,
       isPublished: req.body.isPublished ?? existing.isPublished,
-    });
+    };
 
-    await existing.save();
+    await Cours.updateMany(sequenceFilter, sharedUpdate);
 
     const populated = await Cours.findById(existing._id).populate(
       POPULATE_FIELDS
     );
 
     return res.status(200).json({
-      message: "Cours mis à jour",
+      message:
+        sequenceDocs.length > 1
+          ? `Bloc de ${sequenceDocs.length} créneaux mis à jour`
+          : "Cours mis à jour",
       cours: formatCours(populated),
     });
   } catch (error) {
@@ -339,16 +449,34 @@ export const updateSlot = async (req, res) => {
 // DELETE /api/slots/:id (admin)
 // Suppression physique autorisée : un cours n'est jamais
 // référencé par une autre collection.
+// Multi-créneaux : supprime TOUTE la séquence d'un coup.
 // =====================================================
 export const deleteSlot = async (req, res) => {
   try {
-    const cours = await Cours.findByIdAndDelete(req.params.id);
+    const existing = await Cours.findById(req.params.id);
 
-    if (!cours) {
+    if (!existing) {
       return res.status(404).json({ message: "Cours introuvable" });
     }
 
-    return res.status(200).json({ message: "Cours supprimé" });
+    let deletedCount = 1;
+
+    if (existing.sequenceId) {
+      const result = await Cours.deleteMany({
+        sequenceId: existing.sequenceId,
+      });
+      deletedCount = result.deletedCount;
+    } else {
+      await existing.deleteOne();
+    }
+
+    return res.status(200).json({
+      message:
+        deletedCount > 1
+          ? `Bloc de ${deletedCount} créneaux supprimé`
+          : "Cours supprimé",
+      deletedCount,
+    });
   } catch (error) {
     console.error("DeleteSlot Error:", error);
     return res.status(500).json({ message: "Erreur serveur" });
