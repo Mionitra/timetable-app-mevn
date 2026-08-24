@@ -1,7 +1,8 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import {
-  User
+  User,
+  Group,
 } from "../Models/index.js";
 
 // ===============================
@@ -23,7 +24,8 @@ export const register = async (req, res) => {
       niveau,
       filiere,
       studentId,
-      groupId,
+      teacherType,
+      discipline,
     } = req.body;
 
     // Champs obligatoires
@@ -40,6 +42,34 @@ export const register = async (req, res) => {
     const userRole = role || "etudiant";
     const passwordHash = await bcrypt.hash(password, 10);
 
+    // =====================================================
+    // RECHERCHE AUTOMATIQUE DU GROUPE POUR LES ÉTUDIANTS
+    // =====================================================
+
+    let group = null;
+
+    if (userRole === "etudiant") {
+      if (!filiere || !niveau) {
+        return res.status(400).json({
+          message: "La filière et le niveau sont obligatoires pour un étudiant",
+        });
+      }
+
+      // Chercher le groupe correspondant à filière + niveau
+      group = await Group.findOne({
+        department: filiere,
+        study_level: niveau,
+      });
+
+      if (!group) {
+        return res.status(400).json({
+          message: `Aucun groupe trouvé pour la filière ${filiere} et le niveau ${niveau}`,
+        });
+      }
+
+      console.log(`✅ Groupe trouvé pour ${filiere} ${niveau} : ${group.name} (${group._id})`);
+    }
+
     const user = await User.create({
       first_name: firstName.trim(),
       last_name: lastName.trim(),
@@ -49,12 +79,16 @@ export const register = async (req, res) => {
       // Champs étudiant
       niveau: userRole === "etudiant" ? (niveau || null) : null,
       filiere: userRole === "etudiant" ? (filiere || null) : null,
+      // Groupe trouvé automatiquement
+      group_id: group ? group._id : null,
       // Photos
       profileImage: profileImage || null,
       coverImage: coverImage || null,
       // Optionnels
       student_id: studentId || undefined,
-      group_id: groupId || null,
+      // Enseignant
+      teacher_type: userRole === "enseignant" ? (teacherType || null) : null,
+      discipline: userRole === "enseignant" ? (discipline || null) : null,
       join_date: new Date(),
     });
 
@@ -66,6 +100,9 @@ export const register = async (req, res) => {
         lastName: user.last_name,
         email: user.email,
         role: user.role,
+        filiere: user.filiere,
+        niveau: user.niveau,
+        group_id: user.group_id,
       },
     });
 

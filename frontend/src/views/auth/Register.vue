@@ -292,7 +292,7 @@ onUnmounted(() => {
       <!-- HEADER -->
       <div class="p-8 pb-4">
         <h1 class="mb-2 text-3xl font-bold text-center text-secondary">Inscription</h1>
-        <p class="mb-6 text-center text-gray-500">Créez votre compte universitaire</p>
+        <p class="mb-6 text-center text-white">Créez votre compte universitaire</p>
 
         <!-- INDICATEUR DES 3 ÉTAPES -->
         <div class="flex items-center justify-center mb-6">
@@ -300,7 +300,7 @@ onUnmounted(() => {
           <div class="flex items-center">
             <div :class="[
               'w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300',
-              currentStep >= 1 ? 'bg-primary text-white' : 'bg-gray-50/5/5 text-gray-500',
+              currentStep >= 1 ? 'bg-primary text-white' : 'bg-gray-50/5/5 text-white',
             ]">
               1
             </div>
@@ -315,7 +315,7 @@ onUnmounted(() => {
           <div class="flex items-center">
             <div :class="[
               'w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300',
-              currentStep >= 2 ? 'bg-primary text-white' : 'bg-gray-50/5/5 text-gray-500',
+              currentStep >= 2 ? 'bg-primary text-white' : 'bg-gray-50/5/5 text-white',
             ]">
               2
             </div>
@@ -330,7 +330,7 @@ onUnmounted(() => {
           <div class="flex items-center">
             <div :class="[
               'w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300',
-              currentStep >= 3 ? 'bg-primary text-white' : 'bg-gray-50/5/5 text-gray-500',
+              currentStep >= 3 ? 'bg-primary text-white' : 'bg-gray-50/5/5 text-white',
             ]">
               3
             </div>
@@ -347,7 +347,7 @@ onUnmounted(() => {
           <div v-if="currentStep === 1" key="step1">
             <div class="mb-6">
               <h2 class="mb-1 text-xl font-bold text-secondary">Informations personnelles</h2>
-              <p class="text-sm text-gray-500">
+              <p class="text-sm text-white">
                 Renseignez vos informations d'identité.
               </p>
             </div>
@@ -358,12 +358,12 @@ onUnmounted(() => {
                 <div class="w-full px-2 sm:w-1/2">
                   <label class="block mb-2 font-semibold text-secondary">Prénom</label>
                   <input v-model="firstName" type="text" autocomplete="given-name" placeholder="Votre prénom"
-                    class="w-full p-3 placeholder-gray-400 transition-all border border-gray-300 rounded-lg text-secondary bg-gray-50/5/5 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
+                    class="w-full p-3 text-white placeholder-gray-400 transition-all border border-gray-300 rounded-lg bg-gray-50/5/5 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
                 </div>
                 <div class="w-full px-2 sm:w-1/2">
                   <label class="block mb-2 font-semibold text-secondary">Nom</label>
                   <input v-model="lastName" type="text" autocomplete="family-name" placeholder="Votre nom"
-                    class="w-full p-3 placeholder-gray-400 transition-all border border-gray-300 rounded-lg text-secondary bg-gray-50/5/5 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
+                    class="w-full p-3 text-white placeholder-gray-400 transition-all border border-gray-300 rounded-lg bg-gray-50/5/5 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
                 </div>
               </div>
 
@@ -371,8 +371,8 @@ onUnmounted(() => {
               <div>
                 <label class="block mb-2 font-semibold text-secondary">Email</label>
                 <input v-model="email" type="email" autocomplete="email" placeholder="exemple@gmail.com"
-                  class="w-full p-3 placeholder-gray-400 transition-all border border-gray-300 rounded-lg text-secondary bg-gray-50/5/5 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
-                <p class="mt-2 text-xs text-gray-500">
+                  class="w-full p-3 text-white placeholder-gray-400 transition-all border border-gray-300 rounded-lg bg-gray-50/5/5 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
+                <p class="mt-2 text-xs text-white">
                   Votre adresse email sera utilisée pour vous connecter.
                 </p>
               </div>
@@ -392,7 +392,7 @@ onUnmounted(() => {
           <div v-else-if="currentStep === 2" key="step2">
             <div class="mb-6">
               <h2 class="mb-1 text-xl font-bold text-secondary">Profil académique</h2>
-              <p class="text-sm text-gray-500">
+              <p class="text-sm text-white">
                 Renseignez votre parcours et ajoutez des photos.
               </p>
             </div>
@@ -431,13 +431,13 @@ onUnmounted(() => {
                     <label class="block mb-2 font-medium text-secondary">Photo de profil</label>
                     <input type="file" accept="image/jpeg,image/png,image/webp,image/gif"
                       @change="handleProfileImageUpload"
-                      class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:opacity-90" />
+                      class="block w-full text-sm text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:opacity-90" />
                     <div v-if="profileImageData" class="mt-3">
                       <img :src="profileImageData" alt="Aperçu photo de profil"
                         class="object-cover w-24 h-24 border-2 rounded-full border-primary" />
-                      <p class="mt-1 text-xs text-gray-500">Aperçu</p>
+                      <p class="mt-1 text-xs text-white">Aperçu</p>
                     </div>
-                    <p class="mt-2 text-xs text-gray-500">
+                    <p class="mt-2 text-xs text-white">
                       Formats : JPG, PNG, WEBP, GIF. Max 5 Mo.
                     </p>
                   </div>
@@ -445,13 +445,13 @@ onUnmounted(() => {
                     <label class="block mb-2 font-medium text-secondary">Photo de couverture</label>
                     <input type="file" accept="image/jpeg,image/png,image/webp,image/gif"
                       @change="handleCoverImageUpload"
-                      class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:opacity-90" />
+                      class="block w-full text-sm text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:opacity-90" />
                     <div v-if="coverImageData" class="mt-3">
                       <img :src="coverImageData" alt="Aperçu photo de couverture"
                         class="object-cover w-full border-2 rounded-lg border-primary max-h-32" />
-                      <p class="mt-1 text-xs text-gray-500">Aperçu</p>
+                      <p class="mt-1 text-xs text-white">Aperçu</p>
                     </div>
-                    <p class="mt-2 text-xs text-gray-500">
+                    <p class="mt-2 text-xs text-white">
                       Formats : JPG, PNG, WEBP, GIF. Max 5 Mo.
                     </p>
                   </div>
@@ -479,7 +479,7 @@ onUnmounted(() => {
           <div v-else key="step3">
             <div class="mb-6">
               <h2 class="mb-1 text-xl font-bold text-secondary">Sécurité</h2>
-              <p class="text-sm text-gray-500">
+              <p class="text-sm text-white">
                 Définissez un mot de passe sécurisé pour protéger votre compte.
               </p>
             </div>
@@ -491,14 +491,14 @@ onUnmounted(() => {
                   <label class="block mb-2 font-semibold text-secondary">Mot de passe</label>
                   <input v-model="password" type="password" autocomplete="new-password" placeholder="••••••••"
                     minlength="6"
-                    class="w-full p-3 placeholder-gray-400 transition-all border border-gray-300 rounded-lg text-secondary bg-gray-50/5/5 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
-                  <p class="mt-2 text-xs text-gray-500">Minimum 6 caractères.</p>
+                    class="w-full p-3 text-white placeholder-gray-400 transition-all border border-gray-300 rounded-lg bg-gray-50/5/5 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
+                  <p class="mt-2 text-xs text-white">Minimum 6 caractères.</p>
                 </div>
                 <div class="w-full px-2 sm:w-1/2">
                   <label class="block mb-2 font-semibold text-secondary">Confirmer le mot de passe</label>
                   <input v-model="confirmPassword" type="password" autocomplete="new-password" placeholder="••••••••"
                     minlength="6"
-                    class="w-full p-3 placeholder-gray-400 transition-all border border-gray-300 rounded-lg text-secondary bg-gray-50/5/5 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
+                    class="w-full p-3 text-white placeholder-gray-400 transition-all border border-gray-300 rounded-lg bg-gray-50/5/5 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
                 </div>
               </div>
 
@@ -534,7 +534,7 @@ onUnmounted(() => {
           </div>
         </Transition>
 
-        <p class="mt-6 text-center text-gray-500">
+        <p class="mt-6 text-center text-white">
           Vous avez déjà un compte ?
           <RouterLink to="/connexion" class="ml-1 font-medium text-primary hover:text-blue-300">
             Se connecter
