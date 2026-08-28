@@ -1,7 +1,8 @@
 <script setup>
-import { ref, watch, onUnmounted } from "vue";
+import { ref, watch, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
+import api from "@/services/api";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -18,6 +19,20 @@ const role = ref("etudiant");
 
 const niveau = ref("L1");
 const filiere = ref("IAD");
+
+// Section 2.2 / RF-AUTH-01 : matricule + groupe cible
+const studentId = ref("");
+const groupId = ref("");
+const groupes = ref([]);
+
+onMounted(async () => {
+  try {
+    const response = await api.get("/groupes/public");
+    groupes.value = response.data;
+  } catch (error) {
+    console.error("Erreur de chargement des groupes :", error);
+  }
+});
 
 
 const profileImageFile = ref(null);
@@ -174,6 +189,16 @@ const validateStep2 = () => {
     return false;
   }
 
+  // RF-AUTH-01 : matricule et groupe obligatoires
+  if (!studentId.value || studentId.value.trim().length < 3) {
+    errorMessage.value = "Veuillez entrer votre matricule (minimum 3 caractères).";
+    return false;
+  }
+  if (!groupId.value) {
+    errorMessage.value = "Veuillez sélectionner votre groupe.";
+    return false;
+  }
+
 
   if (!password.value) {
     errorMessage.value = "Veuillez entrer un mot de passe.";
@@ -230,6 +255,8 @@ const buildUserData = () => {
 
     userData.niveau = niveau.value;
     userData.filiere = filiere.value;
+    userData.studentId = studentId.value.trim();
+    userData.groupId = groupId.value;
 
   return userData;
 };
@@ -256,11 +283,14 @@ const handleRegister = async () => {
 
     await authStore.register(userData);
 
-    successMessage.value = "Inscription réussie ! Vous pouvez maintenant vous connecter.";
+    // Section 2.1 / RF-AUTH-02 : le compte étudiant est créé
+    // INACTIF et doit être activé par l'administration.
+    successMessage.value =
+      "Inscription enregistrée ! Votre compte doit maintenant être activé par l'administration avant votre première connexion.";
 
     redirectTimeout = setTimeout(() => {
       router.push("/connexion");
-    }, 1500);
+    }, 4000);
   } catch (error) {
     console.error("Erreur inscription :", error);
     errorMessage.value =
@@ -378,6 +408,24 @@ onUnmounted(() => {
               <div class="p-4 border border-gray-300 bg-gray-50/50 rounded-xl">
                 <h3 class="mb-4 font-semibold text-secondary">🎓 Informations étudiant</h3>
                 <div>
+                  <label class="block mb-2 font-medium text-secondary">Matricule</label>
+                  <input v-model="studentId" type="text" placeholder="Ex : ETU-2026-0142"
+                    class="w-full p-3 text-secondary placeholder-gray-400 transition-all bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                  <p class="mt-2 text-xs text-gray-500">
+                    Votre numéro d'étudiant figure sur votre certificat d'inscription.
+                  </p>
+                </div>
+                <div class="mt-4">
+                  <label class="block mb-2 font-medium text-secondary">Groupe</label>
+                  <select v-model="groupId"
+                    class="w-full p-3 text-secondary bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                    <option value="" disabled>Choisir votre groupe</option>
+                    <option v-for="groupe in groupes" :key="groupe.id" :value="groupe.id">
+                      {{ groupe.name }} — {{ groupe.promotion }}
+                    </option>
+                  </select>
+                </div>
+                <div class="mt-4">
                   <label class="block mb-2 font-medium text-secondary">Niveau d'étude</label>
                   <select v-model="niveau"
                     class="w-full p-3 text-secondary bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">

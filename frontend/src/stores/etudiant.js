@@ -9,7 +9,6 @@ export const useEtudiantStore = defineStore("etudiant", {
       stats: { completedTasks: 0, totalSubjects: 0 },
     },
     schedule: [],
-    subjects: [],
     profile: null,
     loading: false,
     error: null,
@@ -30,30 +29,19 @@ export const useEtudiantStore = defineStore("etudiant", {
       }
     },
 
-    async fetchSchedule() {
+    async fetchSchedule(week) {
       this.loading = true;
       this.error = null;
       try {
-        const response = await api.get("/student/schedule");
+        const params = week
+          ? { weekNumber: week.weekNumber, year: week.year }
+          : {};
+        const response = await api.get("/slots", { params });
         this.schedule = response.data;
       } catch (error) {
         this.error =
           error.response?.data?.message ||
           "Erreur de chargement de l'emploi du temps";
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async fetchSubjects() {
-      this.loading = true;
-      this.error = null;
-      try {
-        const response = await api.get("/student/subjects");
-        this.subjects = response.data;
-      } catch (error) {
-        this.error =
-          error.response?.data?.message || "Erreur de chargement des matières";
       } finally {
         this.loading = false;
       }

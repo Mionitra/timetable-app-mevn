@@ -17,7 +17,6 @@ const breadcrumbs = computed(() => {
 
   if (path === "/etudiant") return ["Home", "Dashboard"];
   if (path.includes("/schedule")) return ["Home", "Schedule"];
-  if (path.includes("/subjects")) return ["Home", "Subjects"];
   if (path.includes("/profile")) return ["Home", "Profile"];
   if (path.includes("/settings")) return ["Home", "Settings"];
 
@@ -124,35 +123,6 @@ const currentDate = new Date().toLocaleDateString("en-US", {
 
           <span class="hidden text-sm font-medium md:block">
             Calendar
-          </span>
-        </RouterLink>
-
-        <!-- Subjects -->
-        <RouterLink
-          to="/etudiant/subjects"
-          class="relative nav-item group"
-          active-class="is-active"
-        >
-          <div class="icon-wrapper">
-            <div class="glow-effect"></div>
-
-            <svg
-              class="relative z-10 w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-              />
-            </svg>
-          </div>
-
-          <span class="hidden text-sm font-medium md:block">
-            Tasks & Subjects
           </span>
         </RouterLink>
 

@@ -35,24 +35,54 @@ const routes = [
 
   {
     path: "/admin",
-    name: "AdminDashboard",
     component: AdminDashboard,
-
     meta: {
       requiresAuth: true,
       role: "admin",
     },
+    children: [
+      {
+        path: "",
+        name: "AdminPlanning",
+        component: () => import("../views/admin/PlanningEditorView.vue"),
+      },
+      {
+        path: "referentiels",
+        name: "AdminReferentiels",
+        component: () => import("../views/admin/ReferentielsView.vue"),
+      },
+      {
+        path: "utilisateurs",
+        name: "AdminUsers",
+        component: () => import("../views/admin/UsersView.vue"),
+      },
+    ],
   },
 
   {
     path: "/enseignant",
-    name: "EnseignantDashboard",
     component: EnseignantDashboard,
-
     meta: {
       requiresAuth: true,
       role: "enseignant",
     },
+    children: [
+      {
+        path: "",
+        name: "EnseignantOverview",
+        component: () => import("../views/enseignant/DashboardOverview.vue"),
+      },
+      {
+        path: "planning",
+        name: "EnseignantPlanning",
+        component: () => import("../views/enseignant/PlanningView.vue"),
+      },
+      {
+        path: "indisponibilites",
+        name: "EnseignantIndisponibilites",
+        component: () => import("../views/enseignant/IndisponibilitesView.vue"),
+      },
+    ],
   },
 
   {
@@ -72,21 +102,6 @@ const routes = [
         path: "schedule",
         name: "EtudiantSchedule",
         component: () => import("../views/etudiant/ScheduleView.vue"),
-      },
-      {
-        path: "subjects",
-        name: "EtudiantSubjects",
-        component: () => import("../views/etudiant/SubjectsView.vue"),
-      },
-      {
-        path: "subjects/:id",
-        name: "EtudiantSubjectDetails",
-        component: () => import("../views/etudiant/SubjectDetailsView.vue"),
-      },
-      {
-        path: "course/:id",
-        name: "EtudiantCourseDetails",
-        component: () => import("../views/etudiant/CourseDetailsView.vue"),
       },
       {
         path: "profile",
@@ -148,3 +163,4 @@ function redirectByRole(role) {
 }
 
 export default router;
+ 

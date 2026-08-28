@@ -9,7 +9,13 @@ const authStore = useAuthStore();
 const email = ref("");
 const password = ref("");
 
+// Section 2.1 / RF-AUTH-02 : distinction du refus lié à un
+// compte étudiant pas encore activé par l'administration.
+const pendingActivation = ref(false);
+
 const handleLogin = async () => {
+  pendingActivation.value = false;
+
   try {
     const data = await authStore.login(
       email.value,
@@ -35,6 +41,10 @@ const handleLogin = async () => {
         router.push("/connexion");
     }
   } catch (error) {
+    if (error?.response?.data?.error === "ACCOUNT_PENDING_ACTIVATION") {
+      pendingActivation.value = true;
+    }
+
     console.error(error);
   }
 };
@@ -76,8 +86,18 @@ const handleLogin = async () => {
           />
         </div>
 
+        <div
+          v-if="pendingActivation"
+          class="p-3 border rounded-lg bg-amber-500/10 border-amber-500/30"
+        >
+          <p class="text-sm font-medium text-amber-500">
+            ⏳ Votre compte est en attente d'activation par l'administration.
+            Vous serez informé une fois votre compte activé.
+          </p>
+        </div>
+
         <p
-          v-if="authStore.error"
+          v-else-if="authStore.error"
           class="text-red-400 text-sm font-medium"
         >
           {{ authStore.error }}
